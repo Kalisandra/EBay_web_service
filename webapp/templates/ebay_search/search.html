@@ -32,7 +32,7 @@
             <div class="col-12">
             <h2>Результаты поиска</h2>
             {% for item in results %}
-            <div class="card mb-3">
+            <div class="card mb-3" >
                 <div class="row no-gutters">
                     <div class="col-sm-2">
                         <div class="text-center">
@@ -43,17 +43,18 @@
                         <div class="card-body">
                             <h5 class="card-title"><a href="{{ item.view_item_url }}">{{ item.title }}</a></h5>
                             <p class="card-text">
-                                Текущая стоимость: {{ item.item_current_price }} {{ item_country }}
+                                Текущая стоимость: {{ item.item_current_price }} {{ item.item_currency }}
                             </p>
-                            <p class="card-text">
+                            <div class="card-text">
                                 Состояние: {{ item.condition_display_name }}
-                            </p>
-                            <p class="card-text">
+                            </div>
+                            <div class="card-text mt-1" >
                                 Количество ставок: {{ item.bid_count }}
-                            </p>
+                            </div>
                             <p class="card-text">
                                 <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
                             </p>
+                            <a href="{{ url_for('.search', itemid=item.item_id, q=request.args.get('q', ''), categoryid=request.args.get('categoryid', '')) }}">добавить в избранное</a>
                         </div>
                     </div>
                 </div>

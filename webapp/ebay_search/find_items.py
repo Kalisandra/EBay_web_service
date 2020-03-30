@@ -45,7 +45,6 @@ def find_items_advanced(query, categiryid):
         # конвертируем время из стандарта ISO 8601 в datetime
 
 
-
     # записываем результаты поиска в список
         search_result.append({
             'item_id': item_id,
