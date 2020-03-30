@@ -73,6 +73,7 @@ def add_to_watch_list(itemid):
     headers = get_shopping_headers('AddToWatchList')
     token = current_user.token
     data = f"""
+    <?xml version="1.0" encoding="utf-8"?>
     <AddToWatchListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
     <RequesterCredentials>
         <eBayAuthToken>{token}</eBayAuthToken>
@@ -83,6 +84,6 @@ def add_to_watch_list(itemid):
 
     response_soup = post_ebay_request(headers, data)
     if response_soup.find('ack').text == 'Success':
-        return flash('Лот успешно добавлен в "Избранное"')
+        return print('Лот успешно добавлен в "Избранное"')
     else:
-        return flash('Лот не добавлен в "Избранное". Результаты поиска устарели')
+        return print('Лот не добавлен в "Избранное". Результаты поиска устарели')
