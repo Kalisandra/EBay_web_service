@@ -37,14 +37,14 @@ def post_ebay_request(headers, data):
     """Направление запроса на api.ebay методом POST.
     В качестве аргументов передаем headers и data
     """ 
-    # try:
-    response = requests.post(
-    url="https://api.ebay.com/ws/api.dll",
-    headers=headers,
-    data=data,
-    )
-    # except requests.RequestException:
-    #     return False
+    try:
+        response = requests.post(
+        url="https://api.ebay.com/ws/api.dll",
+        headers=headers,
+        data=data,
+        )
+    except requests.RequestException:
+        return False
 
     response_soup = BeautifulSoup(response.content, "lxml")
     return response_soup
