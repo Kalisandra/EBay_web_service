@@ -8,7 +8,6 @@ from webapp.utils import get_finding_headers, get_shopping_headers, \
     post_ebay_finding_request, post_ebay_request
 
 
-
 def find_items_advanced(query, categiryid):
     headers = get_finding_headers("findItemsAdvanced")
     data = f"""
@@ -25,6 +24,7 @@ def find_items_advanced(query, categiryid):
     </findItemsAdvancedRequest>"""
 
     response_soup = post_ebay_finding_request(headers, data)
+    print(response_soup)
     all_items = response_soup.find_all('item')
     search_result = []
     for item in all_items:
@@ -112,9 +112,13 @@ def get_user_watch_list():
     response_soup = post_ebay_request(headers, data)
 
     if response_soup.find('ack').text == 'Success':
-        user_wath_list = []
+        user_watch_list = []
         all_items = response_soup.find_all('item')
         for item in all_items:
+            # new_item = {}
+            # keys = {'item_id': 'itemid'}
+            # for key, value in keys.items():
+            #     new_item[key] = parsfield(item, value)
             item_id = item.find('itemid').text
             title = item.find('title').text
             gallery_url = item.find('galleryurl').text
@@ -122,7 +126,7 @@ def get_user_watch_list():
             shipping_type = item.find('shippingtype').text
             item_current_price = item.find('currentprice').text
             item_currency = item.find('currentprice')['currencyid']
-            bid_count = item.find('bidcount').text
+            # bid_count = item.find('bidcount').text
             time_left = item.find('timeleft').text
             end_time = item.find('endtime').text
             listing_type =item.find('listingtype').text 
@@ -132,7 +136,7 @@ def get_user_watch_list():
             end_time = isodate.parse_datetime(end_time).strftime('%Y-%m-%d %H:%M:%S')
 
 # записываем полученные данные в словарь
-            user_wath_list.append({
+            user_watch_list.append({
                 'item_id': item_id,
                 'title': title,
                 'gallery_url': gallery_url,
@@ -140,18 +144,18 @@ def get_user_watch_list():
                 'shipping_type': shipping_type,
                 'item_current_price': item_current_price,
                 'item_currency': item_currency,
-                'bid_count': bid_count,
+                # 'bid_count': bid_count,
                 'time_left': time_left,
                 'end_time': end_time,
                 'listing_type': listing_type,
             })
-        # for item in user_wath_list:
+        # for item in user_watch_list:
         #     for key, value in item.items():
         #         print(f'{key}: {value}')
-        return user_wath_list
+        return user_watch_list
 
 
-def remouve_from_user_watch_list(item_id):
+def remove_from_user_watch_list(itemid):
     """
     Фунция для удаления товара из списка "Избранное" пользователя.
     В качестве аргумента передается id товара
@@ -164,7 +168,7 @@ def remouve_from_user_watch_list(item_id):
     <RequesterCredentials>
         <eBayAuthToken>{token}</eBayAuthToken>
     </RequesterCredentials>
-    <ItemID>{item_id}</ItemID>
+    <ItemID>{itemid}</ItemID>
     </RemoveFromWatchListRequest>
     """
 
