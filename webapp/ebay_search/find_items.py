@@ -149,3 +149,28 @@ def get_user_watch_list():
         #     for key, value in item.items():
         #         print(f'{key}: {value}')
         return user_wath_list
+
+
+def remouve_from_user_watch_list(item_id):
+    """
+    Фунция для удаления товара из списка "Избранное" пользователя.
+    В качестве аргумента передается id товара
+    """
+    headers = get_shopping_headers('RemoveFromWatchList')
+    token = current_user.token
+    data = f"""
+    <?xml version="1.0" encoding="utf-8"?>
+    <RemoveFromWatchListRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+    <RequesterCredentials>
+        <eBayAuthToken>{token}</eBayAuthToken>
+    </RequesterCredentials>
+    <ItemID>{item_id}</ItemID>
+    </RemoveFromWatchListRequest>
+    """
+
+    response_soup = post_ebay_request(headers, data)
+    if response_soup.find('ack').text == 'Success':
+        return print('Лот успешно удален из списка избранных товаров')
+    else:
+        return print('Не получилось удалить лот из списка избоанных товаров.\
+            Обновите страниуц и повторите заново')
