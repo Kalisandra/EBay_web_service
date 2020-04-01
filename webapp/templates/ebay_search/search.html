@@ -63,7 +63,11 @@
                                 <p class="card-text">
                                     <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
                                 </p>
-                                <a class="btn btn-warning" href="{{ url_for('search.add_to', itemid=item.item_id) }}" target="_blank" role="button">добавить в "Избранное"</a>
+                                {% for wish in watch_list if wish.item_id == item.item_id %}
+                                    <a href="{{ url_for('search.remove_from', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-danger" role="button">удалить из "Избранного"</a>
+                                {% else %}
+                                    <a href="{{ url_for('search.add_to', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-warning" role="button">добавить в "Избранное"</a>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
