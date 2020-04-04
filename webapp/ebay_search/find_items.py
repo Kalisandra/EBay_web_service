@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import isodate
-from flask import flash
 from flask_login import current_user
 
 from webapp.utils import get_finding_headers, get_shopping_headers, \
@@ -41,7 +40,7 @@ def find_items_advanced(query, categiryid):
         selling_state = item.find('sellingstate').text
         time_left = item.find('timeleft').text
         end_time = item.find('endtime').text
-        listing_type =item.find('listingtype').text 
+        listing_type = item.find('listingtype').text
         condition_id = item.find('conditionid').text
         condition_display_name = item.find('conditiondisplayname').text
 
