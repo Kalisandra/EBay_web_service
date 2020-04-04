@@ -8,6 +8,42 @@ from webapp.utils import get_finding_headers, get_shopping_headers, \
     post_ebay_finding_request, post_ebay_request
 
 
+soup_keys = {
+    'item_id': 'itemid',
+    'title': 'title',
+    'category_id': 'categoryid',
+    'gallery_url': 'galleryurl',
+    'view_item_url': 'viewitemurl',
+    'item_country': 'itemcountry',
+    'shipping_type': 'shippingtype',
+    'item_current_price_converted': 'convertedcurrentprice',
+    'item_current_price': 'currentprice',
+    'bid_count': 'bidcount',
+    'selling_state': 'sellingstate',
+    'time_left': 'timeleft',
+    'end_time': 'endtime',
+    'listing_type': 'listingtype',
+    'condition_id': 'conditionid',
+    'condition_display_name': 'conditiondisplayname',
+}
+
+def parsfield(item, value):
+    parsed_item = item.find(value)
+    if parsed_item and value == 'endtime':
+        field_value = parsed_item.text
+        field_value = isodate.parse_datetime(field_value).strftime('%Y-%m-%d %H:%M:%S')
+        return field_value
+    elif parsed_item and value == 'timeleft':
+        field_value = parsed_item.text
+        field_value = str(isodate.parse_duration(field_value))
+        return field_value
+    if parsed_item:
+        field_value = parsed_item.text
+        return field_value
+    else:
+        field_value = ''
+        return field_value
+
 
 def find_items_advanced(query, categiryid):
     headers = get_finding_headers("findItemsAdvanced")
@@ -28,47 +64,10 @@ def find_items_advanced(query, categiryid):
     all_items = response_soup.find_all('item')
     search_result = []
     for item in all_items:
-        item_id = item.find('itemid').text
-        title = item.find('title').text
-        category_id = item.find('categoryid').text
-        gallery_url = item.find('galleryurl').text
-        view_item_url = item.find('viewitemurl').text
-        item_country = item.find('country').text
-        shipping_type = item.find('shippingtype').text
-        item_current_price = item.find('currentprice').text
-        item_currency = item.find('currentprice')['currencyid']
-        bid_count = item.find('bidcount').text
-        selling_state = item.find('sellingstate').text
-        time_left = item.find('timeleft').text
-        end_time = item.find('endtime').text
-        listing_type =item.find('listingtype').text 
-        condition_id = item.find('conditionid').text
-        condition_display_name = item.find('conditiondisplayname').text
-
-        # конвертируем время из стандарта ISO 8601 в datetime
-        time_left = str(isodate.parse_duration(time_left))
-        end_time = isodate.parse_datetime(end_time).strftime('%Y-%m-%d %H:%M:%S')
-
-    # записываем результаты поиска в список
-        search_result.append({
-            'item_id': item_id,
-            'title': title,
-            'category_id': category_id,
-            'gallery_url': gallery_url,
-            'view_item_url': view_item_url,
-            'item_country': item_country,
-            'shipping_type': shipping_type,
-            'item_current_price': item_current_price,
-            'item_currency': item_currency,
-            'bid_count': bid_count,
-            'selling_state': selling_state,
-            'time_left': time_left,
-            'end_time': end_time,
-            'listing_type': listing_type,
-            'condition_id': condition_id,
-            'condition_display_name': condition_display_name,
-        })
-
+        pars_item = {}
+        for key, value in soup_keys.items():
+            pars_item[key] = parsfield(item, value)
+        search_result.append(pars_item)
     return search_result
 
 
@@ -91,10 +90,9 @@ def add_to_watch_list(itemid):
     else:
         return print('Лот не добавлен в "Избранное". Результаты поиска устарели')
 
-
 def get_user_watch_list():
     """
-    Функция через запрос к API Ebay прлучает списко избранных лотов
+    Функция через запрос к API Ebay получает список избранных лотов
     """
     headers = get_shopping_headers('GetMyeBayBuying')
     token = current_user.token
@@ -110,45 +108,52 @@ def get_user_watch_list():
     </GetMyeBayBuyingRequest>
     """
     response_soup = post_ebay_request(headers, data)
-
     if response_soup.find('ack').text == 'Success':
         user_watch_list = []
         all_items = response_soup.find_all('item')
         for item in all_items:
-            item_id = item.find('itemid').text
-            title = item.find('title').text
-            gallery_url = item.find('galleryurl').text
-            view_item_url = item.find('viewitemurl').text
-            shipping_type = item.find('shippingtype').text
-            item_current_price = item.find('currentprice').text
-            item_currency = item.find('currentprice')['currencyid']
-            # bid_count = item.find('bidcount').text
-            time_left = item.find('timeleft').text
-            end_time = item.find('endtime').text
-            listing_type =item.find('listingtype').text 
-
-# конвертируем время из стандарта ISO 8601 в datetime
-            time_left = str(isodate.parse_duration(time_left))
-            end_time = isodate.parse_datetime(end_time).strftime('%Y-%m-%d %H:%M:%S')
-
-# записываем полученные данные в словарь
-            user_watch_list.append({
-                'item_id': item_id,
-                'title': title,
-                'gallery_url': gallery_url,
-                'view_item_url': view_item_url,
-                'shipping_type': shipping_type,
-                'item_current_price': item_current_price,
-                'item_currency': item_currency,
-                # 'bid_count': bid_count,
-                'time_left': time_left,
-                'end_time': end_time,
-                'listing_type': listing_type,
-            })
-        # for item in user_watch_list:
-        #     for key, value in item.items():
-        #         print(f'{key}: {value}')
+            pars_watch_item = {}
+            for key, value in soup_keys.items():
+                pars_watch_item[key] = parsfield(item, value)
+            print(pars_watch_item['time_left'])
+            user_watch_list.append(pars_watch_item)
         return user_watch_list
+
+
+#             item_id = item.find('itemid').text
+#             title = item.find('title').text
+#             gallery_url = item.find('galleryurl').text
+#             view_item_url = item.find('viewitemurl').text
+#             shipping_type = item.find('shippingtype').text
+#             item_current_price = item.find('currentprice').text
+#             item_currency = item.find('currentprice')['currencyid']
+#             # bid_count = item.find('bidcount').text
+#             time_left = item.find('timeleft').text
+#             end_time = item.find('endtime').text
+#             listing_type =item.find('listingtype').text 
+
+# # конвертируем время из стандарта ISO 8601 в datetime
+#             time_left = str(isodate.parse_duration(time_left))
+#             end_time = isodate.parse_datetime(end_time).strftime('%Y-%m-%d %H:%M:%S')
+
+# # записываем полученные данные в словарь
+#             user_watch_list.append({
+#                 'item_id': item_id,
+#                 'title': title,
+#                 'gallery_url': gallery_url,
+#                 'view_item_url': view_item_url,
+#                 'shipping_type': shipping_type,
+#                 'item_current_price': item_current_price,
+#                 'item_currency': item_currency,
+#                 # 'bid_count': bid_count,
+#                 'time_left': time_left,
+#                 'end_time': end_time,
+#                 'listing_type': listing_type,
+#             })
+#         # for item in user_watch_list:
+#         #     for key, value in item.items():
+#         #         print(f'{key}: {value}')
+        # return user_watch_list
 
 
 def remove_from_user_watch_list(itemid):

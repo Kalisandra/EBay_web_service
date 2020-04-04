@@ -1,5 +1,5 @@
-from flask import Flask
-from flask_login import LoginManager
+from flask import Flask, render_template, redirect, url_for
+from flask_login import LoginManager, current_user
 
 from webapp.model import db
 from webapp.admin.views import blueprint as admin_blueprint
@@ -25,4 +25,11 @@ def create_app():
     def load_user(user_id):
         return User.query.get(user_id)
 
+    @app.route('/')
+    def index():
+        if current_user.is_authenticated:
+            return redirect(url_for('search.search'))
+        title = "Добро пожаловать на сайт"
+        return render_template('index_page/main_index.html', page_title=title)
+    
     return app
