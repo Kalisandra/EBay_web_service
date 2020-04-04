@@ -61,6 +61,7 @@ def find_items_advanced(query, categiryid):
     </findItemsAdvancedRequest>"""
 
     response_soup = post_ebay_finding_request(headers, data)
+    print(response_soup)
     all_items = response_soup.find_all('item')
     search_result = []
     for item in all_items:
@@ -118,42 +119,6 @@ def get_user_watch_list():
             print(pars_watch_item['time_left'])
             user_watch_list.append(pars_watch_item)
         return user_watch_list
-
-
-#             item_id = item.find('itemid').text
-#             title = item.find('title').text
-#             gallery_url = item.find('galleryurl').text
-#             view_item_url = item.find('viewitemurl').text
-#             shipping_type = item.find('shippingtype').text
-#             item_current_price = item.find('currentprice').text
-#             item_currency = item.find('currentprice')['currencyid']
-#             # bid_count = item.find('bidcount').text
-#             time_left = item.find('timeleft').text
-#             end_time = item.find('endtime').text
-#             listing_type =item.find('listingtype').text 
-
-# # конвертируем время из стандарта ISO 8601 в datetime
-#             time_left = str(isodate.parse_duration(time_left))
-#             end_time = isodate.parse_datetime(end_time).strftime('%Y-%m-%d %H:%M:%S')
-
-# # записываем полученные данные в словарь
-#             user_watch_list.append({
-#                 'item_id': item_id,
-#                 'title': title,
-#                 'gallery_url': gallery_url,
-#                 'view_item_url': view_item_url,
-#                 'shipping_type': shipping_type,
-#                 'item_current_price': item_current_price,
-#                 'item_currency': item_currency,
-#                 # 'bid_count': bid_count,
-#                 'time_left': time_left,
-#                 'end_time': end_time,
-#                 'listing_type': listing_type,
-#             })
-#         # for item in user_watch_list:
-#         #     for key, value in item.items():
-#         #         print(f'{key}: {value}')
-        # return user_watch_list
 
 
 def remove_from_user_watch_list(itemid):
