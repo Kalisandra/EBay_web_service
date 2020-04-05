@@ -4,11 +4,13 @@ from webapp.ebay_search.find_items import (
     find_items_advanced, add_to_watch_list, get_user_watch_list, remove_from_user_watch_list
 )
 from webapp.ebay_search.models import Ebay_Categories
+from webapp.user.decorators import user_required
 
 
 blueprint = Blueprint('search', __name__, url_prefix='/search')
 
 @blueprint.route('/')
+@user_required
 def search():
     # получаем категории товаров Ebay из базы данных 
     categories = Ebay_Categories.query.filter(Ebay_Categories.categorylevel == 1)
@@ -38,6 +40,7 @@ def add_to():
         return render_template('ebay_search/add_to_watch_list.html')
 
 @blueprint.route('/watch_list')
+@user_required
 def open_watch_list():
     watch_items = get_user_watch_list()
     return render_template('ebay_search/watch_list.html', watch_list=watch_items)
@@ -49,5 +52,3 @@ def remove_from():
         remove_from_user_watch_list(item_id)
 
         return render_template('ebay_search/remove_from_watch_list.html')
-
-

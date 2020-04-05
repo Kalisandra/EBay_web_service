@@ -27,8 +27,11 @@ def create_app():
 
     @app.route('/')
     def index():
-        if current_user.is_authenticated:
+        if current_user.is_authenticated and current_user.token_status:
             return redirect(url_for('search.search'))
+        elif (current_user.is_authenticated and
+            current_user.token_status == False):
+            return redirect(url_for('user.get_token'))
         title = "Добро пожаловать на сайт"
         return render_template('index_page/main_index.html', page_title=title)
     
