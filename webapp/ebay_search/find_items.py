@@ -31,17 +31,18 @@ def parsfield(item, value):
     if parsed_item and value == 'endtime':
         field_value = parsed_item.text
         field_value = isodate.parse_datetime(field_value).strftime('%Y-%m-%d %H:%M:%S')
-        return field_value
     elif parsed_item and value == 'timeleft':
         field_value = parsed_item.text
         field_value = str(isodate.parse_duration(field_value))
+<<<<<<< HEAD
         return field_value
+=======
+>>>>>>> 6191ff9745afeea0dfbd23bc88381563d568ec91
     elif parsed_item:
         field_value = parsed_item.text
-        return field_value
     else:
         field_value = ''
-        return field_value
+    return field_value
 
 
 def find_items_advanced(query, categiryid):
