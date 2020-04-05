@@ -16,14 +16,22 @@
                         <div class="card-body">
                             <h5 class="card-title"><a href="{{ item.view_item_url }}">{{ item.title }}</a></h5>
                             <p class="card-text">
-                                Текущая стоимость: {{ item.item_current_price }} {{ item.item_currency }}
+                                {% if item.item_current_price_converted != '' %}
+                                    Текущая стоимость: {{ item.item_current_price_converted }} USD
+                                {% else %}
+                                    Текущая стоимость: {{ item.item_current_price }} USD
+                                {% endif %}
                             </p>
                             <div class="card-text mt-1" >
                                 Количество ставок: {{ item.bid_count }}
                             </div>
-                            <!-- <p class="card-text">
-                                <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
-                            </p> -->
+                            <p class="card-text">
+                                {% if item.time_left == '0:00:00' %}
+                                    <small class="text-muted">Время аукциона истекло</small>
+                                {% else %}
+                                    <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
+                                {% endif %}
+                            </p>
                             <a href="{{ url_for('search.remove_from', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-danger" role="button">удалить из "Избранного"</a>
                         </div>
                     </div>

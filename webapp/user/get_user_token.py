@@ -42,8 +42,7 @@ def get_session_ID():
 def get_token_url():
     """Формирование ссылки, передаваемой пользователю, для получения Token"""
     session_id = get_session_ID()
-    token_url = f"https://signin.ebay.com/ws/eBayISAPI.dll?SignIn\
-        &runame={current_app.config['RUNAME']}&SessID={session_id}"
+    token_url = f"https://signin.ebay.com/ws/eBayISAPI.dll?SignIn&runame={current_app.config['RUNAME']}&SessID={session_id}"
     return token_url
 
 
