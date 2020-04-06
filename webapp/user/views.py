@@ -16,9 +16,10 @@ def login():
         return redirect(url_for('user.redirect_user'))
     elif current_user.is_authenticated and current_user.token:
         return redirect(url_for('search.search'))
-    title = "Авторизация"
-    login_form = LoginForm()
-    return render_template('user/login.html', page_title=title, form=login_form)
+    else:
+        title = "Авторизация"
+        login_form = LoginForm()
+        return render_template('user/login.html', page_title=title, form=login_form)
 
 
 @blueprint.route('/process-login', methods=['POST'])
