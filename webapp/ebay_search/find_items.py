@@ -34,10 +34,6 @@ def parsfield(item, value):
     elif parsed_item and value == 'timeleft':
         field_value = parsed_item.text
         field_value = str(isodate.parse_duration(field_value))
-<<<<<<< HEAD
-        return field_value
-=======
->>>>>>> 6191ff9745afeea0dfbd23bc88381563d568ec91
     elif parsed_item:
         field_value = parsed_item.text
     else:

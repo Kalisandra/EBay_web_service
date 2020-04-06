@@ -11,9 +11,11 @@ blueprint = Blueprint('user', __name__, url_prefix='/users')
 
 @blueprint.route('/')
 def login():
-
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.session_id_status \
+        and current_user.token is None:
         return redirect(url_for('user.redirect_user'))
+    elif current_user.is_authenticated and current_user.token:
+        return redirect(url_for('search.search'))
     title = "Авторизация"
     login_form = LoginForm()
     return render_template('user/login.html', page_title=title, form=login_form)
@@ -56,8 +58,7 @@ def recieve_user_token():
         get_token()
         title = "Вы успешно подключили ваш Ebay-аккаунт"
         return render_template('get_token/get_token_success.html', page_title=title)
-    elif current_user.is_authenticated and current_user.session_id_status \
-        and current_user.token:
+    elif current_user.is_authenticated and current_user.token:
         return redirect(url_for('search.search'))
     else:
         redirect(url_for('index'))
