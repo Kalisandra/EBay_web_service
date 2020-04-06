@@ -8,19 +8,16 @@ from webapp.user.get_user_token import get_token_url, get_token
 
 blueprint = Blueprint('user', __name__, url_prefix='/users')
 
+
 @blueprint.route('/')
 def login():
-# после подтверждения пользователем допуска к своим данным Ebay, он перенаправляется на домашнюю страницу где запускается функция получения токена
-    if current_user.is_authenticated and current_user.session_id_status \
-        and current_user.token == None:
-        get_token()
-        return redirect(url_for('user.redirect_user'))
 
     if current_user.is_authenticated:
         return redirect(url_for('user.redirect_user'))
     title = "Авторизация"
     login_form = LoginForm()
     return render_template('user/login.html', page_title=title, form=login_form)
+
 
 @blueprint.route('/process-login', methods=['POST'])
 def process_login():
@@ -36,17 +33,34 @@ def process_login():
     flash('Неправильное имя или пароль')
     return redirect(url_for('user.login'))
 
+
 @blueprint.route('/logout')
 def logout():
     logout_user()
     flash('Вы успешно разлогинились')
     return redirect(url_for('user.login'))
 
+
 @blueprint.route('/get_token')
 def redirect_user():
     title = "Привязать аккаунт eBay"
     token_url = get_token_url()
     return render_template('get_token/get_token.html', page_title=title, get_token_url=token_url)
+
+
+@blueprint.route('/token')
+def recieve_user_token():
+# после подтверждения пользователем допуска к своим данным Ebay, он перенаправляется на домашнюю страницу где запускается функция получения токена
+    if current_user.is_authenticated and current_user.session_id_status \
+        and current_user.token == None:
+        get_token()
+        title = "Вы успешно подключили ваш Ebay-аккаунт"
+        return render_template('get_token/get_token_success.html', page_title=title)
+    elif current_user.is_authenticated and current_user.session_id_status \
+        and current_user.token:
+        return redirect(url_for('search.search'))
+    else:
+        redirect(url_for('index'))
 
 @blueprint.route('/register')
 def register():
@@ -55,6 +69,7 @@ def register():
     form = RegistrationForm()
     title = "Регистрация"
     return render_template('user/registration.html', page_title=title, form=form)
+
 
 @blueprint.route('/process-reg', methods=['POST'])
 def process_reg():

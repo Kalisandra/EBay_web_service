@@ -27,7 +27,7 @@ def user_required(func):
         elif current_app.config.get('LOGIN_DISABLED'):
             return func(*args, **kwargs)
         elif not current_user.is_authenticated:
-            return current_app.login_manager.unauthorized()
+            return redirect(url_for('index'))
         elif current_user.is_authenticated and current_user.token_status is False:
             return redirect(url_for('user.redirect_user'))
         return func(*args, **kwargs)

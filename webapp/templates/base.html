@@ -10,7 +10,7 @@
         <title>{{ page_title }}</title>
     </head>
     <body>
-        {% if current_user.is_authenticated and current_user.token_status %}}
+        {% if current_user.is_authenticated and current_user.token_status %}
             {% include 'menu.html' %}
         {% endif %}
         <div class="container">
