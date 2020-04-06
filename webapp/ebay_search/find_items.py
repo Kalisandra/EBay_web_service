@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import isodate
-from flask import flash
 from flask_login import current_user
 
 from webapp.utils import get_finding_headers, get_shopping_headers, \
@@ -35,6 +34,10 @@ def parsfield(item, value):
     elif parsed_item and value == 'timeleft':
         field_value = parsed_item.text
         field_value = str(isodate.parse_duration(field_value))
+<<<<<<< HEAD
+        return field_value
+=======
+>>>>>>> 6191ff9745afeea0dfbd23bc88381563d568ec91
     elif parsed_item:
         field_value = parsed_item.text
     else:
@@ -58,7 +61,6 @@ def find_items_advanced(query, categiryid):
     </findItemsAdvancedRequest>"""
 
     response_soup = post_ebay_finding_request(headers, data)
-    print(response_soup)
     all_items = response_soup.find_all('item')
     search_result = []
     for item in all_items:
@@ -113,7 +115,6 @@ def get_user_watch_list():
             pars_watch_item = {}
             for key, value in soup_keys.items():
                 pars_watch_item[key] = parsfield(item, value)
-            print(pars_watch_item['time_left'])
             user_watch_list.append(pars_watch_item)
         return user_watch_list
 

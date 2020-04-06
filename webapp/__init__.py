@@ -5,7 +5,6 @@ from webapp.model import db
 from webapp.admin.views import blueprint as admin_blueprint
 from webapp.ebay_search.views import blueprint as search_blueprint
 from webapp.user.models import User
-from webapp.ebay_search.models import Ebay_Categories
 from webapp.user.views import blueprint as user_blueprint
 
 

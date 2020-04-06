@@ -24,11 +24,11 @@ def search():
         watch_items = get_user_watch_list()
         title = 'Результаты поиска'
     else:
-        results = None
+        results = []
         title = None
-        watch_items = None
+        watch_items = []
         flash('Выберите категорию поиска')
-    
+
     return render_template('ebay_search/search.html', title=title, results=results, categories=categories, watch_list=watch_items)
 
 @blueprint.route('/add_to_watch_list')
