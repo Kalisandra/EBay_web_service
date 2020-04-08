@@ -11,12 +11,15 @@ blueprint = Blueprint('user', __name__, url_prefix='/users')
 
 @blueprint.route('/')
 def login():
-
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.session_id_status \
+        and current_user.token is None:
         return redirect(url_for('user.redirect_user'))
-    title = "Авторизация"
-    login_form = LoginForm()
-    return render_template('user/login.html', page_title=title, form=login_form)
+    elif current_user.is_authenticated and current_user.token:
+        return redirect(url_for('search.search'))
+    else:
+        title = "Авторизация"
+        login_form = LoginForm()
+        return render_template('user/login.html', page_title=title, form=login_form)
 
 
 @blueprint.route('/process-login', methods=['POST'])
@@ -50,17 +53,18 @@ def redirect_user():
 
 @blueprint.route('/token')
 def recieve_user_token():
-# после подтверждения пользователем допуска к своим данным Ebay, он перенаправляется на домашнюю страницу где запускается функция получения токена
+    # после подтверждения пользователем допуска к своим данным Ebay,
+    # он перенаправляется на домашнюю страницу где запускается функция получения токена
     if current_user.is_authenticated and current_user.session_id_status \
-        and current_user.token == None:
+        and not current_user.token:
         get_token()
         title = "Вы успешно подключили ваш Ebay-аккаунт"
         return render_template('get_token/get_token_success.html', page_title=title)
-    elif current_user.is_authenticated and current_user.session_id_status \
-        and current_user.token:
+    elif current_user.is_authenticated and current_user.token:
         return redirect(url_for('search.search'))
     else:
         redirect(url_for('index'))
+
 
 @blueprint.route('/register')
 def register():
@@ -86,8 +90,8 @@ def process_reg():
             for error in errors:
                 flash('Ошибка в поле "{}": - {}'.format(
                     getattr(form, field).label.text,
-                    error
-                    ))
+                    error)
+                )
     return redirect(url_for('user.register'))
     flash('Пожалуйста, исправьте ошибки в форме')
     return redirect(url_for('user.register'))
