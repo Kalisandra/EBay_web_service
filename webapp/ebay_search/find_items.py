@@ -1,10 +1,9 @@
-from datetime import datetime
-
 import isodate
 from flask_login import current_user
 
-from webapp.utils import get_finding_headers, get_shopping_headers, \
-    post_ebay_finding_request, post_ebay_request
+from webapp.utils import (
+    get_finding_headers, get_shopping_headers, post_ebay_finding_request, post_ebay_request,
+)
 
 
 soup_keys = {
@@ -41,7 +40,12 @@ def parsfield(item, value):
     return field_value
 
 
-def find_items_advanced(query, categiryid):
+def find_items_advanced(query, categiryid, page_number=1):
+    """
+    Функция поиска товаров на Ebay по поисковому запросу и выбранной категории товаров
+    """
+    print(page_number)
+    print(type(page_number))
     headers = get_finding_headers("findItemsAdvanced")
     data = f"""
     <findItemsAdvancedRequest xmlns="http://www.ebay.com/marketplace/search/v1/services">
@@ -53,10 +57,15 @@ def find_items_advanced(query, categiryid):
             <value>Auction</value>
             <value>AuctionWithBIN</value>
         </itemFilter>
+        <paginationInput>
+            <entriesPerPage>50</entriesPerPage>
+            <pageNumber>{page_number}</pageNumber>
+        </paginationInput>
         <sortOrder>EndTimeSoonest</sortOrder>
     </findItemsAdvancedRequest>"""
 
     response_soup = post_ebay_finding_request(headers, data)
+    total_pages = int(response_soup.find('totalpages').text)
     all_items = response_soup.find_all('item')
     search_result = []
     for item in all_items:
@@ -64,7 +73,7 @@ def find_items_advanced(query, categiryid):
         for key, value in soup_keys.items():
             pars_item[key] = parsfield(item, value)
         search_result.append(pars_item)
-    return search_result
+    return search_result, total_pages
 
 
 def add_to_watch_list(itemid):
@@ -85,6 +94,7 @@ def add_to_watch_list(itemid):
         return print('Лот успешно добавлен в "Избранное"')
     else:
         return print('Лот не добавлен в "Избранное". Результаты поиска устарели')
+
 
 def get_user_watch_list():
     """

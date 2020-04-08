@@ -20,18 +20,19 @@ def create_app():
     app.register_blueprint(admin_blueprint)
     app.register_blueprint(search_blueprint)
 
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
+
 
     @app.route('/')
     def index():
         if current_user.is_authenticated and current_user.token_status:
             return redirect(url_for('search.search'))
-        elif (current_user.is_authenticated and
-            current_user.token_status == False):
-            return redirect(url_for('user.get_token'))
+        elif (current_user.is_authenticated and not current_user.token_status):
+            return redirect(url_for('user.redirect_user'))
         title = "Добро пожаловать на сайт"
         return render_template('index_page/main_index.html', page_title=title)
-    
+
     return app
