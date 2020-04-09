@@ -65,6 +65,7 @@ def find_items_advanced(query, categiryid, page_number=1):
     </findItemsAdvancedRequest>"""
 
     response_soup = post_ebay_finding_request(headers, data)
+    print(response_soup)
     total_pages = int(response_soup.find('totalpages').text)
     all_items = response_soup.find_all('item')
     search_result = []

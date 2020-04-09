@@ -35,13 +35,15 @@ def search():
     elif q:
         results, total_pages = find_items_advanced(q, chosen_categoryid)
         watch_items = get_user_watch_list()
+        page_number = 1
         title = 'Результаты поиска'
     # параметры для передачи на страницу поиска без поискового запроса
     else:
         results = []
         title = None
         watch_items = []
-        total_pages = None
+        total_pages = ''
+        page_number = ''
         flash('Выберите категорию поиска')
 
     return render_template(
@@ -49,8 +51,9 @@ def search():
         title=title, results=results,
         categories=categories,
         totalpages=total_pages,
-        watch_list=watch_items
-        )
+        watch_list=watch_items,
+        pagenumber=page_number
+         )
 
 @blueprint.route('/add_to_watch_list')
 def add_to():
