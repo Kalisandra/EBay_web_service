@@ -15,8 +15,8 @@
                 {% for category in categories %}
                     <option
                     {% if request.args.get('categoryid', '')== category.categoryid|string() %} selected {% endif %}
-                    value="{{category.categoryid}}">{{ category.categoryname }}</option>
-
+                    value="{{category.categoryid}}">{{ category.categoryname }}
+                    </option>
                 {% endfor %}
             </select>
             <button type="submit" class="btn btn-secondary btn-lg">Поиск</button>
@@ -28,51 +28,82 @@
 
 {% if request.args.get('q') %}
     <div class="row">
-            <div class="col-12">
-            <h2>{{ title }}</h2>
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                <div class="alert alert-warning" role="alert">
-                    {% for message in messages %}
-                        {{ message }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            {% endwith %}
-                {% for item in results %}
-                <div class="card mb-3" >
-                    <div class="row no-gutters">
-                        <div class="col-sm-2">
-                            <div class="text-center">
-                                <img src="{{ item.gallery_url }}" class="img-thumbnail" alt="{{ item.title }}">
+<!-- меню фильтров -->
+        <div class="col-3">
+            <h5>Фильтры</h5>
+            <h5 name="subcategoryid" value="subcategory_id">Подкатегория: {{ subcategory }}</h5>
+            <div class="dropdown">
+                {% for aspect in histogram_container_data %}
+                    <div class="my-1">
+                        <button type="button" class="btn btn-info dropdown-toggle btn-block" data-toggle="dropdown" value="{{ aspect.aspect_name }}">
+                            {{ aspect.aspect_name }}
+                        </button>
+                        <div class="dropdown-menu">
+                        {% for values in aspect.aspect_data %}
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="checkbox" class="form-check-input" value="{{ values.value_name }}">{{ values.value_name }}: {{ values.count }}
+                                </label>
                             </div>
+                        {% endfor %}
                         </div>
-                        <div class="col-sm-10">
-                            <div class="card-body">
-                                <h5 class="card-title"><a href="{{ item.view_item_url }}">{{ item.title }}</a></h5>
-                                <p class="card-text">
-                                    Текущая стоимость: {{ item.item_current_price }} USD
-                                </p>
-                                <div class="card-text">
-                                    Состояние: {{ item.condition_display_name }}
-                                </div>
-                                <div class="card-text mt-1" >
-                                    Количество ставок: {{ item.bid_count }}
-                                </div>
-                                <p class="card-text">
-                                    <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
-                                </p>
-                                {% for wish in watch_list if wish.item_id == item.item_id %}
-                                    <a href="{{ url_for('search.remove_from', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-danger" role="button">удалить из "Избранного"</a>
-                                {% else %}
-                                    <a href="{{ url_for('search.add_to', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-warning" role="button">добавить в "Избранное"</a>
-                                {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
+                'search.search',
+                q=request.args.get('q', ''),
+                categoryid=subcategoryid, 
+                
+                ) }}">Применить фильтры
+            </a>
+        </div>
+<!-- конец меню фильтров -->
+        <div class="col-9">
+        <h2>{{ title }}</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert alert-warning" role="alert">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+            {% for item in results %}
+            <div class="card mb-3" >
+                <div class="row no-gutters">
+                    <div class="col-sm-2">
+                        <div class="text-center">
+                            <img src="{{ item.gallery_url }}" class="img-thumbnail" alt="{{ item.title }}">
+                        </div>
+                    </div>
+                    <div class="col-sm-10">
+                        <div class="card-body">
+                            <h5 class="card-title"><a href="{{ item.view_item_url }}">{{ item.title }}</a></h5>
+                            <p class="card-text">
+                                Текущая стоимость: {{ item.item_current_price }} USD
+                            </p>
+                            <div class="card-text">
+                                Состояние: {{ item.condition_display_name }}
                             </div>
+                            <div class="card-text mt-1" >
+                                Количество ставок: {{ item.bid_count }}
+                            </div>
+                            <p class="card-text">
+                                <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
+                            </p>
+                            {% for wish in watch_list if wish.item_id == item.item_id %}
+                                <a href="{{ url_for('search.remove_from', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-danger" role="button">удалить из "Избранного"</a>
+                            {% else %}
+                                <a href="{{ url_for('search.add_to', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-warning" role="button">добавить в "Избранное"</a>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
+        </div>
 
     <div class="row">
     <nav aria-label="Search results pages">

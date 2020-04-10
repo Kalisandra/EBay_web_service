@@ -25,7 +25,7 @@ def search():
     # обрабатываем поисковый запрос пользователя, номер выбранной страницы
     # и передаем его в html
     if q and page_number:
-        results, total_pages = find_items_advanced(
+        results, total_pages, subcategory, subcategory_id, histogram_container_data = find_items_advanced(
             q, chosen_categoryid, page_number=page_number
             )
         watch_items = get_user_watch_list()
@@ -33,7 +33,7 @@ def search():
     # обрабатываем начальный поисковый запрос пользователя без номера страницы
     # и передаем его в html
     elif q:
-        results, total_pages = find_items_advanced(q, chosen_categoryid)
+        results, total_pages, subcategory, subcategory_id, histogram_container_data = find_items_advanced(q, chosen_categoryid)
         watch_items = get_user_watch_list()
         title = 'Результаты поиска'
     # параметры для передачи на страницу поиска без поискового запроса
@@ -42,6 +42,8 @@ def search():
         title = None
         watch_items = []
         total_pages = None
+        subcategory = None
+        histogram_container_data = []
         flash('Выберите категорию поиска')
 
     return render_template(
@@ -49,7 +51,10 @@ def search():
         title=title, results=results,
         categories=categories,
         totalpages=total_pages,
-        watch_list=watch_items
+        watch_list=watch_items,
+        subcategory=subcategory,
+        histogram_container_data=histogram_container_data,
+        subcategoryid=subcategory_id,
         )
 
 @blueprint.route('/add_to_watch_list')
