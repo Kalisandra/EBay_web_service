@@ -50,6 +50,7 @@
                     </div>
                 {% endfor %}
             </div>
+            
             <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
                 'search.search',
                 q=request.args.get('q', ''),
@@ -80,7 +81,7 @@
                     </div>
                     <div class="col-sm-10">
                         <div class="card-body">
-                            <h5 class="card-title"><a href="{{ item.view_item_url }}">{{ item.title }}</a></h5>
+                            <h5 class="card-title"><a href="{{ item.view_item_url }}" target="_blank">{{ item.title }}</a></h5>
                             <p class="card-text">
                                 Текущая стоимость: {{ item.item_current_price }} USD
                             </p>
@@ -104,30 +105,52 @@
             </div>
             {% endfor %}
         </div>
-
-    <div class="row">
-    <nav aria-label="Search results pages">
-        <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                {% for page in range(1, totalpages + 1) %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for(
-                            'search.search',
-                            q=request.args.get('q', ''),
-                            categoryid=request.args.get('categoryid', ''),
-                            pagenumber=page) }}">{{ page }}
-                        </a>
-                    </li>
-                {% endfor %}
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        </ul>
-        </nav>
-    </div>
+        {% include 'ebay_search/pagination.html' %}
     </div> 
-    {% endif %}
+{% endif %}
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        const generateUrlParams = function () {
+            let params = '&filters=';
+            const buttons = $('button.dropdown-toggle');
+            buttons.each(function (index) {
+                const buttonText = $(this).text();
+                const dropdown = $(this).next();
+                const checkboxes = dropdown.find('input[type=checkbox]:checked');
+                const checkboxesLength = checkboxes.length;
+                if (checkboxesLength) {
+                    params += buttonText.trim() + ':';
+                }
+                checkboxes.each(function (index) {
+                    params += $(this).val();
+                    const checkboxNumber = index + 1;
+                    if (!(checkboxNumber === checkboxesLength)) {
+                        params += ',';
+                    }
+                });
+                const buttonNumber = index + 1;
+                if (checkboxesLength && !(buttonNumber === buttons.length)) {
+                    params += ';';
+                }
+            });
+            console.log(params);
+            return params;
+        };
+        const filterButton = $('.btn-success');
+        const url = filterButton.attr('href');
 
-
+        filterButton.on('click', function (e) {
+            e.preventDefault();
+            window.location = url + generateUrlParams();
+        });
+    });
+</script>
 {% endblock %}
 
     <!-- <a href="{{ url_for('.search', itemid=item.item_id, q=request.args.get('q', ''), categoryid=request.args.get('categoryid', '')) }}" target="_blank">добавить в избранное</a> -->
 
+                <!-- <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+                </li> -->

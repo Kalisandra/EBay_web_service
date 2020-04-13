@@ -1,5 +1,6 @@
 from flask_login import current_user
 
+from webapp import db
 from webapp.utils import get_shopping_headers, post_ebay_request
 from webapp.ebay_search.models import Ebay_Categories
 
@@ -10,13 +11,13 @@ def get_ebay_categories():
     token = current_user.token
     data = f"""
     <?xml version="1.0" encoding="utf-8"?>
-    <GetCategoriesRequest xmlns= >
+    <GetCategoriesRequest xmlns="urn:ebay:apis:eBLBaseComponents">
         <RequesterCredentials>
             <eBayAuthToken>{token}</eBayAuthToken>
-        </RequesterCredentials> 
+        </RequesterCredentials>
         <CategorySiteID>0</CategorySiteID>
     <DetailLevel>ReturnAll</DetailLevel>
-    <LevelLimit>2</LevelLimit>
+    <LevelLimit>4</LevelLimit>
     </GetCategoriesRequest>
     """
 
@@ -49,5 +50,6 @@ def save_category(categoryname, categorylevel, categoryid, categoryparentid):
             categoryid=categoryid,
             categoryparentid=categoryparentid,
             )
+    # !!! необходимо добавить проверку на наличие категории в базе данных
     db.session.add(new_category)
     db.session.commit()

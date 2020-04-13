@@ -41,11 +41,16 @@ def parsfield(item, value):
     return field_value
 
 
-def find_items_advanced(query, categiryid, page_number=1):
+def find_items_advanced(query, categiryid, filters_request='', page_number=1):
     """
     Функция поиска товаров на Ebay по поисковому запросу и выбранной категории товаров
     """
     headers = get_finding_headers("findItemsAdvanced")
+    if filters_request:
+        user_filters_list = user_filters_request(filters_request)
+        filters = make_filter_string_for_finding_request(user_filters_list)
+    else:
+        filters = filters_request
     data = f"""
     <findItemsAdvancedRequest xmlns="http://www.ebay.com/marketplace/search/v1/services">
         <categoryId>{categiryid}</categoryId>
@@ -57,13 +62,16 @@ def find_items_advanced(query, categiryid, page_number=1):
             <value>Auction</value>
             <value>AuctionWithBIN</value>
         </itemFilter>
+        <aspectFilter>
+            {filters}
+        </aspectFilter>
         <paginationInput>
-            <entriesPerPage>2</entriesPerPage>
+            <entriesPerPage>50</entriesPerPage>
             <pageNumber>{page_number}</pageNumber>
         </paginationInput>
         <sortOrder>EndTimeSoonest</sortOrder>
     </findItemsAdvancedRequest>"""
-
+    print(data)
     response_soup = post_ebay_finding_request(headers, data)
     # Получаем количество страниц из ответа на запрос
     total_pages = int(response_soup.find('totalpages').text)
@@ -80,8 +88,8 @@ def find_items_advanced(query, categiryid, page_number=1):
     histogram_container = response_soup.find('aspecthistogramcontainer')
     subcategory = histogram_container.find('domaindisplayname').text
     # получаем id подкатегории из базы данных
-    for categoryid in db.session.query(Ebay_Categories.categoryid).filter_by(categoryname=subcategory).first():
-        subcategory_id = categoryid
+    # for categoryid in db.session.query(Ebay_Categories.categoryid).filter_by(categoryname=subcategory).first():
+    subcategory_id = db.session.query(Ebay_Categories.categoryid).filter_by(categoryname=subcategory).first().categoryid
 
     all_aspects = histogram_container.find_all('aspect')
     histogram_container_data = []
@@ -97,7 +105,6 @@ def find_items_advanced(query, categiryid, page_number=1):
             histogram_values_data.append(value_data)
         aspect_data['aspect_data'] = histogram_values_data
         histogram_container_data.append(aspect_data)
-    # print(histogram_container_data)
     return search_result, total_pages, subcategory, subcategory_id, histogram_container_data
 
 
@@ -173,3 +180,35 @@ def remove_from_user_watch_list(itemid):
     else:
         return print('Не получилось удалить лот из списка избоанных товаров.\
             Обновите страниуц и повторите заново')
+
+
+def user_filters_request(filters_request):
+    """
+    Функция преобразует фильтры из поискового запроса в список
+    """
+    filters_data = filters_request.split(';')
+    filters_data.remove(filters_data[-1])
+    user_filters_request = []
+    for filters in filters_data:
+        category_filters = {}
+        one_category_filters = filters.split(':')
+        category_filters['filter_name'] = one_category_filters[0]
+        category_filters['filter_values'] = one_category_filters[1].split(',')
+        user_filters_request.append(category_filters)
+    return user_filters_request
+
+def make_filter_string_for_finding_request(user_filters_request):
+    """
+    Функция приобразует список фильтров поискового запроса в строку формата
+    data для направление запроса на API EBay
+    """
+    test_string = ''
+    for filters in user_filters_request:
+        if not len(test_string):
+            test_string += f"<aspectName>{filters['filter_name']}</aspectName>"
+        else:
+            test_string += '\n' + f"            <aspectName>{filters['filter_name']}</aspectName>"
+        for value in filters['filter_values']:
+            test_string += '\n' + f"            <aspectValueName>{value}</aspectValueName>"
+    return test_string
+
