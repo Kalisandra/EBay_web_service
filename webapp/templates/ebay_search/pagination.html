@@ -19,8 +19,9 @@
                             'search.search',
                             q=request.args.get('q', ''),
                             categoryid=request.args.get('categoryid', ''),
-                            filters_request = filtersrequest,
-                            pagenumber=page) }}">{{ page }}
+                            pagenumber=page,
+                            filters=request.args.get('filters', ''),
+                            )}}">{{ page }}
                         <span class="sr-only">(current)</span></a>
                     </li>
                 {% else %}
@@ -29,8 +30,9 @@
                             'search.search',
                             q=request.args.get('q', ''),
                             categoryid=request.args.get('categoryid', ''),
-                            filters_request = filtersrequest,
-                            pagenumber=page) }}">{{ page }}
+                            pagenumber=page,
+                            filters=request.args.get('filters', ''),
+                            )}}">{{ page }}
                         </a>
                     </li>
                 {% endif %}

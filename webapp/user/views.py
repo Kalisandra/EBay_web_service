@@ -93,4 +93,3 @@ def process_reg():
                     error)
                 )
         return redirect(url_for('user.register'))
-

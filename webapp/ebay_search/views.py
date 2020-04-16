@@ -2,7 +2,7 @@ from flask import Blueprint, flash, render_template, request
 
 from webapp.ebay_search.find_items import (
     find_items_advanced, add_to_watch_list, get_user_watch_list,
-    remove_from_user_watch_list,
+    remove_from_user_watch_list, get_user_filters_request, delete_filter_from_request,
 )
 from webapp.ebay_search.models import Ebay_Categories
 from webapp.user.decorators import user_required
@@ -24,28 +24,30 @@ def search():
     # получаем значения выбранных фильтров расширенного поиска
     filters_request = request.args.get('filters')
     print(filters_request)
+    if filters_request:
+        user_filters_list = get_user_filters_request(filters_request)
+        print(user_filters_list)
+    else:
+        user_filters_list = []
 
 
-    # обрабатываем поисковый запрос пользователя, номер выбранной страницы
+    # обрабатываем поисковый запрос пользователя, номер выбранной страницы, фильтры
     # и передаем его в html
     if q and page_number and filters_request:
-        print("страница, фильтр")
         results, total_pages, subcategory, subcategory_id, histogram_container_data = find_items_advanced(
-            q, chosen_categoryid, filters_request=filters_request, page_number=page_number,
+            q, chosen_categoryid, page_number=page_number, user_filters_list=user_filters_list,
             )
         watch_items = get_user_watch_list()
         title = 'Результаты поиска'
     elif q and filters_request:
-        print("фильтры")
-        results, total_pages, subcategory, subcategory_id, histogram_container_data = find_items_advanced(
-            q, chosen_categoryid, filters_request=filters_request
+        results, total_pages, subcategory, subcategory_id, histogram_container_data, = find_items_advanced(
+            q, chosen_categoryid, user_filters_list=user_filters_list
             )
         watch_items = get_user_watch_list()
         page_number = 1
         title = 'Результаты поиска'
     elif q and page_number:
-        print('страница')
-        results, total_pages, subcategory, subcategory_id, histogram_container_data = find_items_advanced(
+        results, total_pages, subcategory, subcategory_id, histogram_container_data, = find_items_advanced(
             q, chosen_categoryid, page_number=page_number
             )
         watch_items = get_user_watch_list()
@@ -53,8 +55,7 @@ def search():
     # обрабатываем начальный поисковый запрос пользователя без номера страницы
     # и передаем его в html
     elif q:
-        print('просто запрос')
-        results, total_pages, subcategory, subcategory_id, histogram_container_data = find_items_advanced(q, chosen_categoryid)
+        results, total_pages, subcategory, subcategory_id, histogram_container_data, = find_items_advanced(q, chosen_categoryid)
         watch_items = get_user_watch_list()
         page_number = 1
         title = 'Результаты поиска'
@@ -68,7 +69,6 @@ def search():
         subcategory = ''
         subcategory_id = ''
         histogram_container_data = ''
-        filters_request = ''
         flash('Выберите категорию поиска')
 
     return render_template(
@@ -81,7 +81,7 @@ def search():
         subcategory=subcategory,
         subcategoryid=subcategory_id,
         histogram_container_data=histogram_container_data,
-        filtersrequest=filters_request,
+        userfilterslist=user_filters_list,
         )
 
 @blueprint.route('/add_to_watch_list')
@@ -103,5 +103,8 @@ def remove_from():
     item_id = request.args.get('itemid')
     if item_id:
         remove_from_user_watch_list(item_id)
-
         return render_template('ebay_search/remove_from_watch_list.html')
+
+
+# @blueprint.route('/delete_filter')
+# def delete_filter(filters_request, value):

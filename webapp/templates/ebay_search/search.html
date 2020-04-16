@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
+<div class="row my-2">
     <div class="col-2"></div>
     <div class="col-8">
     <form class="form-inline" method="GET">
@@ -27,6 +27,25 @@
 </div>
 
 {% if request.args.get('q') %}
+<!-- блок отображения выбранных фильтров -->
+{% if userfilterslist %}
+    <div class="row my-2">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <h5>Примененные фильтры</h5>
+            <div class="btn-group">
+                {% for filters in userfilterslist %}
+                    {% for value in filters.filter_values %}
+                        <button type="button" class="btn btn-primary mx-1" value="value">{{ value }}</button>
+                    {% endfor%}
+                {% endfor%}
+              </div>
+        </div>
+        <div class="col-2"></div>
+    </div>
+{% endif%}
+<!-- конец блока отображения вбранных фильтров -->
+
     <div class="row">
 <!-- меню фильтров -->
         <div class="col-3">
@@ -40,11 +59,11 @@
                         </button>
                         <div class="dropdown-menu">
                         {% for values in aspect.aspect_data %}
-                            <div class="form-check">
-                                <label class="form-check-label">
+                            <li class="form-check">
+                                <label class="form-check-label px-2">
                                     <input type="checkbox" class="form-check-input" value="{{ values.value_name }}">{{ values.value_name }}: {{ values.count }}
                                 </label>
-                            </div>
+                            </li>
                         {% endfor %}
                         </div>
                     </div>
@@ -54,8 +73,8 @@
             <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
                 'search.search',
                 q=request.args.get('q', ''),
-                categoryid=subcategoryid, 
-                
+                categoryid=subcategoryid,
+                filters=request.args.get('filters', ''),
                 ) }}">Применить фильтры
             </a>
         </div>
@@ -112,8 +131,9 @@
 {% block script %}
 <script>
     $(document).ready(function () {
-        const generateUrlParams = function () {
-            let params = '&filters=';
+        const generateUrlParams = function (url) {
+            let params = '';
+            // url = decodeURIComponent(url)
             const buttons = $('button.dropdown-toggle');
             buttons.each(function (index) {
                 const buttonText = $(this).text();
@@ -131,19 +151,19 @@
                     }
                 });
                 const buttonNumber = index + 1;
-                if (checkboxesLength && !(buttonNumber === buttons.length)) {
+                if (checkboxesLength) {
                     params += ';';
                 }
             });
-            console.log(params);
-            return params;
+            params = encodeURIComponent(params)
+            return url + params;
         };
         const filterButton = $('.btn-success');
         const url = filterButton.attr('href');
 
         filterButton.on('click', function (e) {
             e.preventDefault();
-            window.location = url + generateUrlParams();
+            window.location = generateUrlParams(url);
         });
     });
 </script>

@@ -50,6 +50,5 @@ def save_category(categoryname, categorylevel, categoryid, categoryparentid):
             categoryid=categoryid,
             categoryparentid=categoryparentid,
             )
-    # !!! необходимо добавить проверку на наличие категории в базе данных
-    db.session.add(new_category)
-    db.session.commit()
+        db.session.add(new_category)
+        db.session.commit()

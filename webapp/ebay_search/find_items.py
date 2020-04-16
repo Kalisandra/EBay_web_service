@@ -41,16 +41,15 @@ def parsfield(item, value):
     return field_value
 
 
-def find_items_advanced(query, categiryid, filters_request='', page_number=1):
+def find_items_advanced(query, categiryid, page_number=1, user_filters_list=[]):
     """
     Функция поиска товаров на Ebay по поисковому запросу и выбранной категории товаров
     """
     headers = get_finding_headers("findItemsAdvanced")
-    if filters_request:
-        user_filters_list = user_filters_request(filters_request)
+    if user_filters_list:
         filters = make_filter_string_for_finding_request(user_filters_list)
     else:
-        filters = filters_request
+        filters = None
     data = f"""
     <findItemsAdvancedRequest xmlns="http://www.ebay.com/marketplace/search/v1/services">
         <categoryId>{categiryid}</categoryId>
@@ -73,6 +72,7 @@ def find_items_advanced(query, categiryid, filters_request='', page_number=1):
     </findItemsAdvancedRequest>"""
     print(data)
     response_soup = post_ebay_finding_request(headers, data)
+    print(response_soup)
     # Получаем количество страниц из ответа на запрос
     total_pages = int(response_soup.find('totalpages').text)
     # Обрабатываем результаты поискового запроса
@@ -182,7 +182,7 @@ def remove_from_user_watch_list(itemid):
             Обновите страниуц и повторите заново')
 
 
-def user_filters_request(filters_request):
+def get_user_filters_request(filters_request):
     """
     Функция преобразует фильтры из поискового запроса в список
     """
@@ -190,6 +190,7 @@ def user_filters_request(filters_request):
     filters_data.remove(filters_data[-1])
     user_filters_request = []
     for filters in filters_data:
+        filters = filters.replace('&', '&amp;')
         category_filters = {}
         one_category_filters = filters.split(':')
         category_filters['filter_name'] = one_category_filters[0]
@@ -212,3 +213,16 @@ def make_filter_string_for_finding_request(user_filters_request):
             test_string += '\n' + f"            <aspectValueName>{value}</aspectValueName>"
     return test_string
 
+
+def delete_filter_from_request(filters_request, value):
+    """
+    Функция удаляет фильтр из списка избранных фильтров пользователя по запросу с html
+    """
+    user_filters_request = get_user_filters_request(filters_request)
+    for filters in user_filters_request:
+        if len(filters['filter_values']) == 1 and value in filters['filter_values']:
+            user_filters_request.remove(filters)
+            del filters
+        elif value in filters['filter_values']:
+            filters['filter_values'].remove(value)
+    return user_filters_request
