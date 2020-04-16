@@ -16,12 +16,13 @@ def get_ebay_categories():
         </RequesterCredentials> 
         <CategorySiteID>0</CategorySiteID>
     <DetailLevel>ReturnAll</DetailLevel>
-    <LevelLimit>2</LevelLimit>
+    <LevelLimit>3</LevelLimit>
     </GetCategoriesRequest>
     """
 
     response_soup = post_ebay_request(headers, data)
     all_categories = response_soup.findAll('category')
+    print(all_categories)
     for category in all_categories:
         category_level = category.find('categorylevel').text
         category_name = category.find('categoryname').text

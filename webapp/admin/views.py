@@ -11,6 +11,7 @@ blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 @blueprint.route('/')
 @admin_required
 def admin_index():
-    make_offer()
+    get_ebay_categories()
+    # make_offer()
     title = "Панель управления"
     return render_template('admin/index.html', page_title=title)
