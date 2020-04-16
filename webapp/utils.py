@@ -33,6 +33,47 @@ def get_finding_headers(call_name):
     return headers
 
 
+    # def search_data_request(filters, categiryid, query, page_number):
+    # if not filters:
+    #     data = f"""
+    #     <findItemsAdvancedRequest xmlns="http://www.ebay.com/marketplace/search/v1/services">
+    #     <categoryId>{categiryid}</categoryId>
+    #     <outputSelector>AspectHistogram</outputSelector>
+    #     <descriptionSearch>true</descriptionSearch>
+    #     <keywords>{query}</keywords>
+    #     <itemFilter>
+    #         <name>ListingType</name>
+    #         <value>Auction</value>
+    #         <value>AuctionWithBIN</value>
+    #     </itemFilter>
+    #     <paginationInput>
+    #         <entriesPerPage>50</entriesPerPage>
+    #         <pageNumber>{page_number}</pageNumber>
+    #     </paginationInput>
+    #     <sortOrder>EndTimeSoonest</sortOrder>
+    #     </findItemsAdvancedRequest>"""
+    # else:
+    
+    #     data = f"""
+    #     <findItemsAdvancedRequest xmlns="http://www.ebay.com/marketplace/search/v1/services">
+    #     <categoryId>{categiryid}</categoryId>
+    #     <outputSelector>AspectHistogram</outputSelector>
+    #     <descriptionSearch>true</descriptionSearch>
+    #     <keywords>{query}</keywords>
+    #     <itemFilter>
+    #         <name>ListingType</name>
+    #         <value>Auction</value>
+    #         <value>AuctionWithBIN</value>
+    #         {filters}
+    #     </itemFilter>
+    #     <paginationInput>
+    #         <entriesPerPage>50</entriesPerPage>
+    #         <pageNumber>{page_number}</pageNumber>
+    #     </paginationInput>
+    #     <sortOrder>EndTimeSoonest</sortOrder>
+    #     </findItemsAdvancedRequest>"""
+
+
 def post_ebay_request(headers, data):
     """Направление запроса на api.ebay методом POST.
     В качестве аргументов передаем headers и data

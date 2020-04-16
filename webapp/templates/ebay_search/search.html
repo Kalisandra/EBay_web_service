@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
+<div class="row my-2">
     <div class="col-2"></div>
     <div class="col-8">
     <form class="form-inline" method="GET">
@@ -15,8 +15,8 @@
                 {% for category in categories %}
                     <option
                     {% if request.args.get('categoryid', '')== category.categoryid|string() %} selected {% endif %}
-                    value="{{category.categoryid}}">{{ category.categoryname }}</option>
-
+                    value="{{category.categoryid}}">{{ category.categoryname }}
+                    </option>
                 {% endfor %}
             </select>
             <button type="submit" class="btn btn-secondary btn-lg">Поиск</button>
@@ -27,8 +27,59 @@
 </div>
 
 {% if request.args.get('q') %}
+<!-- блок отображения выбранных фильтров -->
+{% if userfilterslist %}
+    <div class="row my-2">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <h5>Примененные фильтры</h5>
+            <div class="btn-group">
+                {% for filters in userfilterslist %}
+                    {% for value in filters.filter_values %}
+                        <button type="button" class="btn btn-primary mx-1" value="value">{{ value }}</button>
+                    {% endfor%}
+                {% endfor%}
+              </div>
+        </div>
+        <div class="col-2"></div>
+    </div>
+{% endif%}
+<!-- конец блока отображения вбранных фильтров -->
+
     <div class="row">
-        <div class="col-12">
+<!-- меню фильтров -->
+        <div class="col-3">
+            <h5>Фильтры</h5>
+            <h5 name="subcategoryid" value="subcategory_id">Подкатегория: {{ subcategory }}</h5>
+            <div class="dropdown">
+                {% for aspect in histogram_container_data %}
+                    <div class="my-1">
+                        <button type="button" class="btn btn-info dropdown-toggle btn-block" data-toggle="dropdown" value="{{ aspect.aspect_name }}">
+                            {{ aspect.aspect_name }}
+                        </button>
+                        <div class="dropdown-menu">
+                        {% for values in aspect.aspect_data %}
+                            <li class="form-check">
+                                <label class="form-check-label px-2">
+                                    <input type="checkbox" class="form-check-input" value="{{ values.value_name }}">{{ values.value_name }}: {{ values.count }}
+                                </label>
+                            </li>
+                        {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
+                'search.search',
+                q=request.args.get('q', ''),
+                categoryid=subcategoryid,
+                filters=request.args.get('filters', ''),
+                ) }}">Применить фильтры
+            </a>
+        </div>
+<!-- конец меню фильтров -->
+        <div class="col-9">
         <h2>{{ title }}</h2>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -76,8 +127,46 @@
         {% include 'ebay_search/pagination.html' %}
     </div> 
 {% endif %}
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        const generateUrlParams = function (url) {
+            let params = '';
+            // url = decodeURIComponent(url)
+            const buttons = $('button.dropdown-toggle');
+            buttons.each(function (index) {
+                const buttonText = $(this).text();
+                const dropdown = $(this).next();
+                const checkboxes = dropdown.find('input[type=checkbox]:checked');
+                const checkboxesLength = checkboxes.length;
+                if (checkboxesLength) {
+                    params += buttonText.trim() + ':';
+                }
+                checkboxes.each(function (index) {
+                    params += $(this).val();
+                    const checkboxNumber = index + 1;
+                    if (!(checkboxNumber === checkboxesLength)) {
+                        params += ',';
+                    }
+                });
+                const buttonNumber = index + 1;
+                if (checkboxesLength) {
+                    params += ';';
+                }
+            });
+            params = encodeURIComponent(params)
+            return url + params;
+        };
+        const filterButton = $('.btn-success');
+        const url = filterButton.attr('href');
 
-
+        filterButton.on('click', function (e) {
+            e.preventDefault();
+            window.location = generateUrlParams(url);
+        });
+    });
+</script>
 {% endblock %}
 
     <!-- <a href="{{ url_for('.search', itemid=item.item_id, q=request.args.get('q', ''), categoryid=request.args.get('categoryid', '')) }}" target="_blank">добавить в избранное</a> -->
