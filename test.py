@@ -65,5 +65,12 @@ from bs4 import BeautifulSoup
 #         for value in filters['filter_values']:
 #             test_string += '\n' + f"<value>{value}</value>"
 
-user_string = 'Binding:Hardcover;Subject:Biography & Autobiography;'
+user_filters_request = [{'filter_name': 'Binding', 'filter_values': ['Hardcover']}]
+value = "Hardcover"
 
+for filters in user_filters_request:
+    if len(filters['filter_values']) == 1 and value in filters['filter_values']:
+        user_filters_request.remove(filters)
+    elif value in filters['filter_values']:
+        filters['filter_values'].remove(value)
+print(user_filters_request)
