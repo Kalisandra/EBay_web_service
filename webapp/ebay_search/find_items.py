@@ -72,7 +72,6 @@ def find_items_advanced(query, categiryid, page_number=1, user_filters_list=[]):
     </findItemsAdvancedRequest>"""
     print(data)
     response_soup = post_ebay_finding_request(headers, data)
-    print(response_soup)
     # Получаем количество страниц из ответа на запрос
     total_pages = int(response_soup.find('totalpages').text)
     # Обрабатываем результаты поискового запроса
@@ -190,7 +189,7 @@ def get_user_filters_request(filters_request):
     filters_data.remove(filters_data[-1])
     user_filters_request = []
     for filters in filters_data:
-        filters = filters.replace('&', '&amp;')
+        filters = filters.replace('&', '&amp;').replace('"', '&quot;').replace("'", '&apos;')
         category_filters = {}
         one_category_filters = filters.split(':')
         category_filters['filter_name'] = one_category_filters[0]
@@ -214,14 +213,12 @@ def make_filter_string_for_finding_request(user_filters_request):
     return test_string
 
 
-def delete_filter_from_request(filters_request, value):
+def delete_filter_from_request(user_filters_request, value):
     """
     Функция удаляет фильтр из списка избранных фильтров пользователя по запросу с html
     """
-    user_filters_request = get_user_filters_request(filters_request)
     for filters in user_filters_request:
         if len(filters['filter_values']) == 1 and value in filters['filter_values']:
-            user_filters_request.remove(filters)
             del filters
         elif value in filters['filter_values']:
             filters['filter_values'].remove(value)
