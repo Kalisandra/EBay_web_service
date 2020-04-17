@@ -67,3 +67,4 @@ from bs4 import BeautifulSoup
 
 user_string = 'Binding:Hardcover;Subject:Biography & Autobiography;'
 
+

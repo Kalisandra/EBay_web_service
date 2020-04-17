@@ -46,8 +46,9 @@
                     'search.search',
                     q=request.args.get('q', ''),
                     categoryid=request.args.get('categoryid', ''),
-                    filters_request= filtersrequest,
-                    pagenumber=(pagenumber|int() + 1)) }}">Следующая</a></li>
+                    pagenumber=(pagenumber|int() + 1),
+                    filters_request=request.args.get('filters', ''),
+                    ) }}">Следующая</a></li>
             {% endif %}
         </ul>
     </nav>

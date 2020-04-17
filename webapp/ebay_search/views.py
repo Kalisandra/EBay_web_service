@@ -23,23 +23,30 @@ def search():
     page_number = request.args.get('pagenumber')
     # получаем значения выбранных фильтров расширенного поиска
     filters_request = request.args.get('filters')
+    # получаем значение фильтра, удаляемое из поискового запроса
+    value = request.args.get('value')
     print(filters_request)
-    if filters_request:
+    if filters_request and value:
         user_filters_list = get_user_filters_request(filters_request)
+        user_filters_list = delete_filter_from_request(user_filters_list, value)
+        print(value)
         print(user_filters_list)
+    elif filters_request:
+        user_filters_list = get_user_filters_request(filters_request)
     else:
         user_filters_list = []
 
 
     # обрабатываем поисковый запрос пользователя, номер выбранной страницы, фильтры
     # и передаем его в html
-    if q and page_number and filters_request:
+
+    if q and page_number and user_filters_list:
         results, total_pages, subcategory, subcategory_id, histogram_container_data = find_items_advanced(
             q, chosen_categoryid, page_number=page_number, user_filters_list=user_filters_list,
             )
         watch_items = get_user_watch_list()
         title = 'Результаты поиска'
-    elif q and filters_request:
+    elif q and user_filters_list:
         results, total_pages, subcategory, subcategory_id, histogram_container_data, = find_items_advanced(
             q, chosen_categoryid, user_filters_list=user_filters_list
             )
@@ -104,7 +111,3 @@ def remove_from():
     if item_id:
         remove_from_user_watch_list(item_id)
         return render_template('ebay_search/remove_from_watch_list.html')
-
-
-# @blueprint.route('/delete_filter')
-# def delete_filter(filters_request, value):

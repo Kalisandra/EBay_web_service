@@ -36,9 +36,19 @@
             <div class="btn-group">
                 {% for filters in userfilterslist %}
                     {% for value in filters.filter_values %}
-                        <button type="button" class="btn btn-primary mx-1" value="value">{{ value }}</button>
+                        <a role="button" class="btn btn-primary mx-1" href="{{ url_for(
+                            'search.search',
+                            q=request.args.get('q', ''),
+                            categoryid=subcategoryid,
+                            filters=request.args.get('filters', ''),
+                            value=value,
+                            ) }}">{{ value }}</a>
                     {% endfor%}
                 {% endfor%}
+                <a class="btn btn-success mx-1" role="button" href="#"
+
+                    >Сохранить поиск
+                </a>
               </div>
         </div>
         <div class="col-2"></div>

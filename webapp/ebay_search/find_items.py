@@ -219,7 +219,7 @@ def delete_filter_from_request(user_filters_request, value):
     """
     for filters in user_filters_request:
         if len(filters['filter_values']) == 1 and value in filters['filter_values']:
-            del filters
+            user_filters_request.remove(filters)
         elif value in filters['filter_values']:
             filters['filter_values'].remove(value)
     return user_filters_request

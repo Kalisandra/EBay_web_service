@@ -23,6 +23,7 @@ def get_ebay_categories():
 
     response_soup = post_ebay_request(headers, data)
     all_categories = response_soup.findAll('category')
+    print(all_categories)
     for category in all_categories:
         category_level = category.find('categorylevel').text
         category_name = category.find('categoryname').text
