@@ -112,30 +112,3 @@ def remove_from():
     if item_id:
         remove_from_user_watch_list(item_id)
         return render_template('ebay_search/remove_from_watch_list.html')
-
-
-@blueprint.route('/delete_filter')
-def delete_filter(user_filters_request, value):
-    user_filters_list = delete_filter_from_request(user_filters_request, value)
-    categories = Ebay_Categories.query.filter(Ebay_Categories.categorylevel == 1)
-    q = request.args.get('q')
-    chosen_categoryid = request.args.get('categoryid')
-    if q and user_filters_list:
-        results, total_pages, subcategory, subcategory_id, histogram_container_data, = find_items_advanced(
-            q, chosen_categoryid, user_filters_list=user_filters_list
-            )
-        watch_items = get_user_watch_list()
-        page_number = 1
-        title = 'Результаты поиска'
-    return render_template(
-        'ebay_search/search.html',
-        title=title, results=results,
-        categories=categories,
-        totalpages=total_pages,
-        watch_list=watch_items,
-        pagenumber=page_number,
-        subcategory=subcategory,
-        subcategoryid=subcategory_id,
-        histogram_container_data=histogram_container_data,
-        userfilterslist=user_filters_list,
-        )
