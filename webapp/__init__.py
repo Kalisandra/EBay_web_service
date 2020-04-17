@@ -5,8 +5,10 @@ from flask_migrate import Migrate
 from webapp.model import db
 from webapp.admin.views import blueprint as admin_blueprint
 from webapp.ebay_search.views import blueprint as search_blueprint
+from webapp.favorite_searches.views import blueprint as favorite_searches
 from webapp.user.models import User
 from webapp.user.views import blueprint as user_blueprint
+
 
 
 def create_app():
