@@ -67,4 +67,9 @@ from bs4 import BeautifulSoup
 
 user_string = 'Binding:Hardcover;Subject:Biography & Autobiography;'
 
-
+                        # <!-- <a role="button" class="btn btn-primary mx-1" href="{{ url_for(
+                        #     'search.search',
+                        #     q=request.args.get('q', ''),
+                        #     categoryid=subcategoryid,
+                        #     filters=new_filters_request(request.args.get('filters', ''), value),
+                        #     ) }}">{{ value }}</a> -->

@@ -8,7 +8,5 @@ class Ebay_Categories(db.Model):
     categoryid = db.Column(db.Integer, unique=True, nullable=False)
     categoryparentid = db.Column(db.Integer)
 
-
-
     def __repr__(self):
         return '<categoryname={} categoryid={}>'.format(self.categoryname, self.categoryid)

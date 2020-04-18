@@ -2,7 +2,7 @@ from flask import Blueprint, flash, render_template, request
 
 from webapp.ebay_search.find_items import (
     find_items_advanced, add_to_watch_list, get_user_watch_list,
-    remove_from_user_watch_list, get_user_filters_request, delete_filter_from_request,
+    remove_from_user_watch_list, get_user_filters_request,
 )
 from webapp.ebay_search.models import Ebay_Categories
 from webapp.user.decorators import user_required
@@ -23,15 +23,9 @@ def search():
     page_number = request.args.get('pagenumber')
     # получаем значения выбранных фильтров расширенного поиска
     filters_request = request.args.get('filters')
-    # получаем значение фильтра, удаляемое из поискового запроса
-    value = request.args.get('value')
     print(filters_request)
-    if filters_request and value:
-        user_filters_list = get_user_filters_request(filters_request)
-        user_filters_list = delete_filter_from_request(user_filters_list, value)
-        print(value)
-        print(user_filters_list)
-    elif filters_request:
+    # получаем значение фильтра, удаляемое из поискового запроса
+    if filters_request:
         user_filters_list = get_user_filters_request(filters_request)
     else:
         user_filters_list = []
@@ -111,3 +105,24 @@ def remove_from():
     if item_id:
         remove_from_user_watch_list(item_id)
         return render_template('ebay_search/remove_from_watch_list.html')
+
+
+@blueprint.context_processor
+def filter_processor():
+    def delete_filter_from_request(filters_request, value):
+        """
+        Функция удаляет фильтр из списка избранных фильтров пользователя по запросу с html
+        """
+        user_filters_request = get_user_filters_request(filters_request)
+        for filters in user_filters_request:
+            if len(filters['filter_values']) == 1 and value in filters['filter_values']:
+                user_filters_request.remove(filters)
+            elif value in filters['filter_values']:
+                filters['filter_values'].remove(value)
+        new_filters_request = ''
+        for filters in user_filters_request:
+            new_filters_request += f"{filters['filter_name']}:"
+            for value in filters['filter_values']:
+                new_filters_request += f"{value};"
+        return new_filters_request
+    return dict(new_filters_request=delete_filter_from_request)

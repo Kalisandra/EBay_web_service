@@ -40,15 +40,14 @@
                             'search.search',
                             q=request.args.get('q', ''),
                             categoryid=subcategoryid,
-                            filters=request.args.get('filters', ''),
-                            value=value,
+                            filters=new_filters_request(request.args.get('filters', ''), value),
                             ) }}">{{ value }}</a>
                     {% endfor%}
                 {% endfor%}
-                <a class="btn btn-success mx-1" role="button" href="#"
+                <!-- <a class="btn btn-success mx-1" role="button" href=""
 
                     >Сохранить поиск
-                </a>
+                </a> -->
               </div>
         </div>
         <div class="col-2"></div>
