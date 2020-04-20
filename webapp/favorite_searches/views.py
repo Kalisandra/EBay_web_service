@@ -1,5 +1,5 @@
-from datetime import datetime
-from flask import Blueprint, request
+
+from flask import Blueprint, request, render_template
 from flask_login import current_user
 
 from webapp import db
@@ -9,7 +9,22 @@ from webapp.user.decorators import user_required
 
 blueprint = Blueprint('favorite_searches', __name__, url_prefix='/favorite_searches')
 
+
+
 @blueprint.route('/')
+@user_required
+def open_favorite_searches():
+    favorite_searches_list = Favorite_searches.query.filter(
+        Favorite_searches.user_id == current_user.id
+        ).order_by(Favorite_searches.date_of_creation.desc()).all()
+
+    return render_template(
+        'favorite_searches/favorite_searches.html',
+        favorite_searches_list=favorite_searches_list
+        )
+
+
+@blueprint.route('/add_to_favorite_searches')
 @user_required
 def add_to_favorite_searches():
     """
@@ -21,16 +36,29 @@ def add_to_favorite_searches():
     chosen_categoryid = request.args.get('categoryid')
     # получаем значения выбранных фильтров расширенного поиска
     filters_request = request.args.get('filters')
+    # получаем имя сохраненного поискового запроса
+    query_name = request.args.get('query_name')
+    print(query_name)
 
     user_query_exists = Favorite_searches.query.filter(
         Favorite_searches.user_query == q).count()
     if not user_query_exists:
-        new_user_query_exists = Favorite_searches(
-            user_id=current_user.user_id,
+        new_user_query = Favorite_searches(
+            user_id=current_user.id,
+            query_name=query_name,
             user_query=q,
             chosen_categoryid=chosen_categoryid,
-            filters_request=filters_request,
-            date_of_creation=datetime.now()
+            filter_request=filters_request,
             )
-        db.session.add(new_user_query_exists)
+        db.session.add(new_user_query)
         db.session.commit()
+        return render_template('favorite_searches/add_to_favorite_searches.html')
+
+
+
+# @blueprint.route('/remove_favorite_searches')
+# def remove_from_favorite_searches():
+#     item_id = request.args.get('itemid')
+#     if item_id:
+#         remove_from_user_watch_list(item_id)
+#         return render_template('ebay_search/remove_from_watch_list.html')

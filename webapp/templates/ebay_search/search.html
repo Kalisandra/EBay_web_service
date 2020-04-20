@@ -30,8 +30,9 @@
 <!-- блок отображения выбранных фильтров -->
 {% if userfilterslist %}
     <div class="row my-2">
-        <div class="col-2"></div>
-        <div class="col-8">
+        <div class="col-2">
+        </div>
+        <div class="col-6">
             <h5>Примененные фильтры</h5>
             <div class="btn-group">
                 {% for filters in userfilterslist %}
@@ -44,13 +45,18 @@
                             ) }}">{{ value }}</a>
                     {% endfor%}
                 {% endfor%}
-                <!-- <a class="btn btn-success mx-1" role="button" href=""
-
-                    >Сохранить поиск
-                </a> -->
-              </div>
+            </div>
         </div>
-        <div class="col-2"></div>
+        <div class="col-4">
+            <form action="{{ url_for('favorite_searches.add_to_favorite_searches') }}" class="form-inline" method="GET">
+                <input type="hidden" name="q" value="{{ request.args.get('q', '') }}">
+                <input type="hidden" name="categoryid" value="{{ subcategoryid }}">
+                <input type="hidden" name="filters" value="{{ request.args.get('filters', '') }}">
+                <input type="text" class="form-control" placeholder="Имя запроса" name="query_name" 
+                value="{{ request.args.get('query_name', '') }}">
+                <button type="submit" class="btn btn-secondary btn-lg">Сохранить поиск</button>
+            </form>
+        </div>
     </div>
 {% endif%}
 <!-- конец блока отображения вбранных фильтров -->
@@ -177,9 +183,3 @@
     });
 </script>
 {% endblock %}
-
-    <!-- <a href="{{ url_for('.search', itemid=item.item_id, q=request.args.get('q', ''), categoryid=request.args.get('categoryid', '')) }}" target="_blank">добавить в избранное</a> -->
-
-                <!-- <li class="page-item active" aria-current="page">
-                    <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
-                </li> -->

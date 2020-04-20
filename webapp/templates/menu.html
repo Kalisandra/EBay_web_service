@@ -12,6 +12,9 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{{ url_for('search.open_watch_list') }}">Избранное</a>
                 </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{ url_for('favorite_searches.open_favorite_searches') }}">Избранные поиски</a>
+                </li>
             </ul>
             <ul class="navbar-nav">
                 {% if current_user.is_authenticated %}
