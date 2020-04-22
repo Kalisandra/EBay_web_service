@@ -19,6 +19,12 @@
                     <small>Сохранено: {{ user_search.date_of_creation.strftime('%d.%m.%Y') }} 
                     </small>
                     </p>
+                    <a href="{{ url_for('favorite_searches.remove_from_favorite_searches', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Удалить из "Избранных поисков"</a>
+                    {% if not user_search.statistic_status %}
+                        <a href="{{ url_for('favorite_searches.add_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-warning" role="button">Включить сбор статистики цен</a>
+                    {% else %}
+                        <a href="{{ url_for('favorite_searches.stop_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Выключить сбор статистики цен</a>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
