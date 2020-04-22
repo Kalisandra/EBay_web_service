@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+from flask_login import current_user
+from webapp.utils import get_shopping_headers, post_ebay_request
 
 # def get_item():
 #     headers = {
@@ -67,9 +69,22 @@ from bs4 import BeautifulSoup
 
 user_string = 'Binding:Hardcover;Subject:Biography & Autobiography;'
 
-                        # <!-- <a role="button" class="btn btn-primary mx-1" href="{{ url_for(
-                        #     'search.search',
-                        #     q=request.args.get('q', ''),
-                        #     categoryid=subcategoryid,
-                        #     filters=new_filters_request(request.args.get('filters', ''), value),
-                        #     ) }}">{{ value }}</a> -->
+def get_item():
+    headers = get_shopping_headers("GetItem")
+    token = current_user.token
+    data = f"""
+    <?xml version="1.0" encoding="utf-8"?>
+    <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+    <RequesterCredentials>
+        <eBayAuthToken>{token}</eBayAuthToken>
+    </RequesterCredentials>
+    <ItemID>264684789864</ItemID>
+    </GetItemRequest>"""
+
+    response_soup = post_ebay_request(headers, data)
+    item = response_soup.find('item')
+    pars_item = {}
+    for key, value in soup_keys.items():
+        pars_item[key] = parsfield(item, value)
+
+    return pars_item

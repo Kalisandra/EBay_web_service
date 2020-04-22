@@ -107,6 +107,30 @@ def find_items_advanced(query, categiryid, page_number=1, user_filters_list=[]):
     return search_result, total_pages, subcategory, subcategory_id, histogram_container_data
 
 
+def get_item(item_id):
+    """
+    Функция запрашивает данные о конкретном товаре с Ebay по item_id
+    """
+    headers = get_shopping_headers("GetItem")
+    token = current_user.token
+    data = f"""
+    <?xml version="1.0" encoding="utf-8"?>
+    <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
+    <RequesterCredentials>
+        <eBayAuthToken>{token}</eBayAuthToken>
+    </RequesterCredentials>
+    <ItemID>{item_id}</ItemID>
+    </GetItemRequest>"""
+
+    response_soup = post_ebay_request(headers, data)
+    item = response_soup.find('item')
+    pars_item = {}
+    for key, value in soup_keys.items():
+        pars_item[key] = parsfield(item, value)
+
+    return pars_item
+
+
 def add_to_watch_list(itemid):
     headers = get_shopping_headers('AddToWatchList')
     token = current_user.token
