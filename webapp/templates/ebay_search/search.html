@@ -7,7 +7,7 @@
     <form class="form-inline" method="GET">
         <div class="input-group input-group-lg">
             <input type="text" class="form-control" placeholder="Поиск" name="q" 
-            value="{{ request.args.get('q', '') }}">
+            value="{{ request.args.get('q', '') }}" required>
         
             <select class="custom-select" name="categoryid">
                 <option value=""
@@ -59,7 +59,7 @@
         </div>
     </div>
 {% endif%}
-<!-- конец блока отображения вбранных фильтров -->
+<!-- конец блока отображения выбранных фильтров -->
 
     <div class="row">
 <!-- меню фильтров -->

@@ -107,12 +107,11 @@ def find_items_advanced(query, categiryid, page_number=1, user_filters_list=[]):
     return search_result, total_pages, subcategory, subcategory_id, histogram_container_data
 
 
-def get_item(item_id):
+def get_item(item_id, token):
     """
     Функция запрашивает данные о конкретном товаре с Ebay по item_id
     """
     headers = get_shopping_headers("GetItem")
-    token = current_user.token
     data = f"""
     <?xml version="1.0" encoding="utf-8"?>
     <GetItemRequest xmlns="urn:ebay:apis:eBLBaseComponents">
