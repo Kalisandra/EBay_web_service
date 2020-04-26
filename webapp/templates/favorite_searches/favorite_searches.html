@@ -24,6 +24,7 @@
                         <a href="{{ url_for('favorite_searches.add_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-warning" role="button">Включить сбор статистики цен</a>
                     {% else %}
                         <a href="{{ url_for('favorite_searches.stop_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Выключить сбор статистики цен</a>
+                        <a href="{{ url_for('favorite_searches.visualize_statistics', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Показать статистику цен</a>
                     {% endif %}
                 </div>
             </div>

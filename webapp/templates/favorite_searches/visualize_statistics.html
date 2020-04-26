@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if items_list %}
+        <h3>Завершенные аукционы:</h3>
+        <img src="/plot.png" alt="my plot">
+        {% for item in items_list %}
+            <div class="card">
+                <div class="card-body">
+                    <a href="{{ item.item_url }}" target="_blank" role="button">{{ item.item_name }}</a>
+                    <p class="card-text my-1">Время завершения аукциона: {{ item.end_time }}</p>
+                    <p class="card-text my-1">Итоговая цена: {{ item.final_price }} USD</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h3>По данному запросу пока нет завершенных аукционов для сбора статистики цен</h3>
+    {% endif %}
+{% endblock %}
+

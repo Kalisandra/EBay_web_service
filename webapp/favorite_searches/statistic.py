@@ -56,7 +56,7 @@ def get_item_to_statistic():
                 new_statistic_item = Statistic_items(
                     query_id=query_id,
                     item_id=item['item_id'],
-                    item_name = item['title'],
+                    item_name=item['title'],
                     item_current_price=item['item_current_price_converted'],
                     end_time=datetime.strptime(item['end_time'], '%Y-%m-%d %H:%M:%S'),
                     item_url=item['view_item_url'],
@@ -72,5 +72,7 @@ def get_final_price():
         time = get_ebay_time(user_token)
         if item.end_time < time:
             pars_item = get_item(item.item_id, user_token)
+            item.item_name = pars_item['title']
             item.final_price = pars_item['item_current_price_converted']
+            item.bids = pars_item['bid_count']
             db.session.commit()
