@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from flask import Blueprint, request, render_template
 from flask_login import current_user
 
@@ -76,7 +76,7 @@ def add_statistic():
         favorite_search = Favorite_searches.query.filter(
             Favorite_searches.id == search_id).first()
         favorite_search.statistic_status = True
-        favorite_search.statistic_start_date = datetime.now()
+        favorite_search.statistic_start_date = date.today()
         db.session.commit()
         title = "Сбор статистики цен включен"
         return render_template('favorite_searches/favorite_searches_action.html', title=title)  
