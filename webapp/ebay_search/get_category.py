@@ -4,6 +4,7 @@ from webapp import db
 from webapp.utils import get_shopping_headers, post_ebay_request
 from webapp.ebay_search.models import Ebay_Categories
 
+
 def get_ebay_categories():
     """Запрос категорий с Ebay"""
 
@@ -36,7 +37,6 @@ def get_ebay_categories():
             category_id,
             category_parent_id,
             )
-
 
 
 def save_category(categoryname, categorylevel, categoryid, categoryparentid):

@@ -1,37 +1,59 @@
-{% extends "base.html" %}
-
-{% block content %}
-    {% if favorite_searches_list %}
-        <h3>"Избранные поиски"</h3>
-        {% for user_search in favorite_searches_list %}
-            <div class="card">
-                <div class="card-body py-1">
-                    <p class="card-text my-1">Название поиска: {{ user_search.query_name }}</p>
-                    <p class="card-text my-1">Поисковый запрос: {{ user_search.user_query }}</p>
-                    <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
+{% extends "base.html" %} {% block content %} {% if favorite_searches_list %}
+<h3>"Избранные поиски"</h3>
+{% for user_search in favorite_searches_list %}
+<div class="card">
+  <div class="card-body">
+    <p class="card-text my-1">Название поиска: {{ user_search.query_name }}</p>
+    <p class="card-text my-1">Поисковый запрос: {{ user_search.user_query }}</p>
+    <a
+      class="btn btn-success btn-block my-1"
+      role="button"
+      href="{{ url_for(
                     'search.search',
                     q=user_search.user_query,
                     categoryid=user_search.chosen_categoryid,
                     filters=user_search.filter_request,
-                    ) }}">Применить поиск
-                    </a>
-                    <p class="card-text">
-                    <small>Сохранено: {{ user_search.date_of_creation.strftime('%d.%m.%Y') }} 
-                    </small>
-                    </p>
-                    <a href="{{ url_for('favorite_searches.remove_from_favorite_searches', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Удалить из "Избранных поисков"</a>
-                    {% if not user_search.statistic_status %}
-                        <a href="{{ url_for('favorite_searches.add_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-warning" role="button">Включить сбор статистики цен</a>
-                    {% else %}
-                        <a href="{{ url_for('favorite_searches.stop_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Выключить сбор статистики цен</a>
-                        <a href="{{ url_for('favorite_searches.visualize_statistics', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Показать статистику цен</a>
-                        <p class="card-text my-1">Сбор статистики цен включен до: {{ user_search.statistic_start_date }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        {% endfor %}
+                    ) }}"
+      >Применить поиск
+    </a>
+    <p class="card-text">
+      <small
+        >Сохранено: {{ user_search.date_of_creation.strftime('%d.%m.%Y') }}
+      </small>
+    </p>
+    <a
+      href="{{ url_for('favorite_searches.remove_from_favorite_searches', id=user_search.id) }}"
+      target="_blank"
+      class="btn btn-danger"
+      role="button"
+      >Удалить из "Избранных поисков"</a
+    >
+    {% if not user_search.statistic_status %}
+    <a
+      href="{{ url_for('favorite_searches.add_statistic', id=user_search.id) }}"
+      target="_blank"
+      class="btn btn-warning"
+      role="button"
+      >Включить сбор статистики цен на 7 дней</a
+    >
     {% else %}
-        <h3>У Вас нет "Избранных поисков"</h3>
+    <a
+      href="{{ url_for('favorite_searches.stop_statistic', id=user_search.id) }}"
+      target="_blank"
+      class="btn btn-danger"
+      role="button"
+      >Выключить сбор статистики цен</a
+    >
+    <a
+      href="{{ url_for('favorite_searches.visualize_statistics', id=user_search.id) }}"
+      target="_blank"
+      class="btn btn-info"
+      role="button"
+      >Показать статистику цен</a
+    >
     {% endif %}
-{% endblock %}
-
+  </div>
+</div>
+{% endfor %} {% else %}
+<h3>У Вас нет "Избранных поисков"</h3>
+{% endif %} {% endblock %}

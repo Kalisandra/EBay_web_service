@@ -19,6 +19,7 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
+
 def user_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
@@ -28,7 +29,8 @@ def user_required(func):
             return func(*args, **kwargs)
         elif not current_user.is_authenticated:
             return redirect(url_for('index'))
-        elif current_user.is_authenticated and current_user.token_status is False:
+        elif (current_user.is_authenticated and
+                current_user.token_status is False):
             return redirect(url_for('user.redirect_user'))
         return func(*args, **kwargs)
     return decorated_view

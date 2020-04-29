@@ -4,7 +4,11 @@ from flask_login import current_user
 import isodate
 
 from webapp import db
-from webapp.ebay_search.find_items import find_items_advanced, get_user_filters_request, get_item
+from webapp.ebay_search.find_items import (
+    find_items_advanced,
+    get_user_filters_request,
+    get_item
+    )
 from webapp.favorite_searches.models import Favorite_searches, Statistic_items
 from webapp.utils import get_shopping_headers, post_ebay_request
 
@@ -23,7 +27,8 @@ def get_ebay_time(token):
     </GeteBayOfficialTimeRequest>"""
     response_soup = post_ebay_request(headers, data)
     current_time = response_soup.find('timestamp').text
-    current_time = isodate.parse_datetime(current_time).strftime('%Y-%m-%d %H:%M:%S')
+    current_time = isodate.parse_datetime(
+        current_time).strftime('%Y-%m-%d %H:%M:%S')
     current_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
     return current_time
 
@@ -46,7 +51,8 @@ def get_item_to_statistic():
             query = search.user_query
             categiryid = search.chosen_categoryid
             user_filters_list = get_user_filters_request(search.filter_request)
-            search_result = find_items_advanced(query, categiryid, user_filters_list=user_filters_list)[0]
+            search_result = find_items_advanced(
+                query, categiryid, user_filters_list=user_filters_list)[0]
         # Записываем уникальные лоты в отдельную таблицу в базе
         for item in search_result:
             item_exists = Statistic_items.query.filter(
@@ -57,7 +63,8 @@ def get_item_to_statistic():
                     item_id=item['item_id'],
                     item_name=item['title'],
                     item_current_price=item['item_current_price_converted'],
-                    end_time=datetime.strptime(item['end_time'], '%Y-%m-%d %H:%M:%S'),
+                    end_time=datetime.strptime(
+                        item['end_time'], '%Y-%m-%d %H:%M:%S'),
                     item_url=item['view_item_url'],
                     )
                 db.session.add(new_statistic_item)

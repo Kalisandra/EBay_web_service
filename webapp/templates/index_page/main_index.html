@@ -1,19 +1,29 @@
-{% extends "base.html" %}
-
-{% block content %}
-    <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
-            <title>{{ page_title }}</title>
-            <body>
-            <h2> {{ page_title }} </h2>
-            <h3>Cервер работает только для зарегистрированных пользователей.
-                Пожалуйта, авторизуйтесь или пройдите регистрацию</h3>
-            <div>
-                <a href="{{ url_for('user.login') }}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Авторизация</a>
-                <a href="{{ url_for('user.register') }}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Регистрация</a>
-            </div>
-        </div>
-        <div class="col-2"></div>
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-2"></div>
+  <div class="col-8">
+    <h2>{{ page_title }}</h2>
+    <h3>
+      Cервер работает только для зарегистрированных пользователей. Пожалуйта,
+      авторизуйтесь или пройдите регистрацию
+    </h3>
+    <div>
+      <a
+        href="{{ url_for('user.login') }}"
+        class="btn btn-primary btn-lg active"
+        role="button"
+        aria-pressed="true"
+        >Авторизация</a
+      >
+      <a
+        href="{{ url_for('user.register') }}"
+        class="btn btn-primary btn-lg active"
+        role="button"
+        aria-pressed="true"
+        >Регистрация</a
+      >
     </div>
+  </div>
+  <div class="col-2"></div>
+</div>
 {% endblock %}

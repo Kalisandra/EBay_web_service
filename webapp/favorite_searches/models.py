@@ -16,14 +16,18 @@ class Favorite_searches(db.Model):
     user_query = db.Column(db.String(100), nullable=False)
     chosen_categoryid = db.Column(db.Integer, nullable=False)
     filter_request = db.Column(db.Text, nullable=False)
-    date_of_creation = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    date_of_creation = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.now(),
+        )
     statistic_status = db.Column(db.Boolean, nullable=True)
     statistic_start_date = db.Column(db.DateTime, nullable=True)
     user = relationship('User', backref='favorite_searches')
 
-
     def __repr__(self):
-        return '<user_id={} query={} filter_request={}>'.format(self.user_id, self.user_query, self.filter_request)
+        return '<user_id={} query={} filter_request={}>'.format(
+            self.user_id, self.user_query, self.filter_request)
 
 
 class Statistic_items(db.Model):
@@ -41,8 +45,11 @@ class Statistic_items(db.Model):
     final_price = db.Column(db.Integer, nullable=True)
     item_url = db.Column(db.String(200), nullable=False)
     bids = db.Column(db.Integer, nullable=True)
-    favorite_searches = relationship('Favorite_searches', backref='statistic_items')
-
+    favorite_searches = relationship(
+        'Favorite_searches',
+        backref='statistic_items',
+        )
 
     def __repr__(self):
-        return '<query_id={} end_time={} final_price={}>'.format(self.query_id, self.end_time, self.final_price)
+        return '<query_id={} end_time={} final_price={}>'.format(
+            self.query_id, self.end_time, self.final_price)

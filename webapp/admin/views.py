@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template
 
-from webapp.ebay_search.get_category import get_ebay_categories
 from webapp.user.decorators import admin_required
 
 

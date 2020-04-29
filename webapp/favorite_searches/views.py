@@ -10,8 +10,8 @@ from webapp.favorite_searches.models import Favorite_searches, Statistic_items
 from webapp.user.decorators import user_required
 
 
-blueprint = Blueprint('favorite_searches', __name__,
-                      url_prefix='/favorite_searches')
+blueprint = Blueprint(
+    'favorite_searches', __name__, url_prefix='/favorite_searches')
 
 
 @blueprint.route('/')
@@ -55,7 +55,8 @@ def add_to_favorite_searches():
         db.session.add(new_user_query)
         db.session.commit()
 
-        return render_template('favorite_searches/add_to_favorite_searches.html')
+        return render_template(
+            'favorite_searches/add_to_favorite_searches.html')
 
 
 @blueprint.route('/remove_from_favorite_searches')
@@ -67,7 +68,8 @@ def remove_from_favorite_searches():
         db.session.delete(favorite_search)
         db.session.commit()
         title = "Поиск успешно удален из 'Избранных поисков'"
-        return render_template('favorite_searches/favorite_searches_action.html', title=title)
+        return render_template(
+            'favorite_searches/favorite_searches_action.html', title=title)
 
 
 @blueprint.route('/add_statistic')
@@ -80,7 +82,8 @@ def add_statistic():
         favorite_search.statistic_start_date = datetime.now()
         db.session.commit()
         title = "Сбор статистики цен включен"
-        return render_template('favorite_searches/favorite_searches_action.html', title=title)
+        return render_template(
+            'favorite_searches/favorite_searches_action.html', title=title)  
 
 
 @blueprint.route('/stop_statistic')
@@ -93,7 +96,8 @@ def stop_statistic():
         favorite_search.statistic_start_date = None
         db.session.commit()
         title = "Сбор статистики цен выключен"
-        return render_template('favorite_searches/favorite_searches_action.html', title=title)
+        return render_template(
+            'favorite_searches/favorite_searches_action.html', title=title)
 
 
 @blueprint.route('/visualize_statistics')
@@ -115,6 +119,3 @@ def visualize_diagram():
     output = io.BytesIO()
     diagram = FigureCanvas(diagram).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
-
-    # items_list = Statistic_items.query.filter(
-    # Statistic_items.query_id == search_id).filter(Statistic_items.end_time.is_not_(None)).order_by(Statistic_items.end_time.asc()).all()

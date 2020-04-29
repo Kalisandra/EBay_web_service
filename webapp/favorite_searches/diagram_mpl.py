@@ -1,3 +1,6 @@
+from matplotlib import pyplot as plt
+from matplotlib import dates as mpl_dates
+
 from datetime import datetime, timedelta
 
 from matplotlib import pyplot as plt
@@ -9,7 +12,9 @@ from webapp.favorite_searches.models import Statistic_items
 
 def plot_statistics(query_id):
     items_list = Statistic_items.query.filter(
-        Statistic_items.query_id == query_id, Statistic_items.final_price.isnot(None)).order_by(Statistic_items.end_time.asc()).all()
+        Statistic_items.query_id == query_id,
+        Statistic_items.final_price.isnot(None)).order_by(
+            Statistic_items.end_time.asc()).all()
     x_data = []
     y_data = []
     bids_data = []

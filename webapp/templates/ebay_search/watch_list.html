@@ -1,47 +1,56 @@
-{% extends "base.html" %}
-
-{% block content %}
-    <div class="row">
-        <div class="col-12">
-            <h2>{{ title }}</h2>
-            {% for item in watch_list %}
-            <div class="card mb-3" >
-                <div class="row no-gutters">
-                    <div class="col-sm-2">
-                        <div class="text-center">
-                            <img src="{{ item.gallery_url }}" class="img-thumbnail" alt="{{ item.title }}">
-                        </div>
-                    </div>
-                    <div class="col-sm-10">
-                        <div class="card-body">
-                            <h5 class="card-title"><a href="{{ item.view_item_url }}">{{ item.title }}</a></h5>
-                            <p class="card-text">
-                                {% if item.item_current_price_converted != '' %}
-                                    Текущая стоимость: {{ item.item_current_price_converted }} USD
-                                {% else %}
-                                    Текущая стоимость: {{ item.item_current_price }} USD
-                                {% endif %}
-                            </p>
-                            <div class="card-text mt-1" >
-                                Количество ставок: {{ item.bid_count }}
-                            </div>
-                            <p class="card-text">
-                                {% if item.time_left == '0:00:00' %}
-                                    <small class="text-muted">Время аукциона истекло</small>
-                                {% else %}
-                                    <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
-                                {% endif %}
-                            </p>
-                            <a href="{{ url_for('search.remove_from', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-danger" role="button">удалить из "Избранного"</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+{% extends "base.html" %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <h2>{{ title }}</h2>
+    {% for item in watch_list %}
+    <div class="card mb-3">
+      <div class="row no-gutters">
+        <div class="col-sm-2">
+          <div class="text-center">
+            <img
+              src="{{ item.gallery_url }}"
+              class="img-thumbnail"
+              alt="{{ item.title }}"
+            />
+          </div>
         </div>
+        <div class="col-sm-10">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{{ item.view_item_url }}">{{ item.title }}</a>
+            </h5>
+            <p class="card-text">
+              {% if item.item_current_price_converted != '' %} Текущая
+              стоимость: {{ item.item_current_price_converted }} USD {% else %}
+              Текущая стоимость: {{ item.item_current_price }} USD {% endif %}
+            </p>
+            <div class="card-text mt-1">
+              Количество ставок: {{ item.bid_count }}
+            </div>
+            <p class="card-text">
+              {% if item.time_left == '0:00:00' %}
+              <small class="text-muted">Время аукциона истекло</small>
+              {% else %}
+              <small class="text-muted"
+                >До конца аукциона: {{ item.time_left }}</small
+              >
+              {% endif %}
+            </p>
+            <a
+              href="{{ url_for('search.remove_from', itemid=item.item_id) }}"
+              target="_blank"
+              class="btn btn-outline-danger"
+              role="button"
+              >удалить из "Избранного"</a
+            >
+          </div>
+        </div>
+      </div>
     </div>
+    {% endfor %}
+  </div>
+</div>
 
 {% endblock %}
 
-    <!-- <a href="{{ url_for('.search', itemid=item.item_id, q=request.args.get('q', ''), categoryid=request.args.get('categoryid', '')) }}" target="_blank">добавить в избранное</a> -->
-
+<!-- <a href="{{ url_for('.search', itemid=item.item_id, q=request.args.get('q', ''), categoryid=request.args.get('categoryid', '')) }}" target="_blank">добавить в избранное</a> -->

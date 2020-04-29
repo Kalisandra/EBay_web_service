@@ -10,7 +10,6 @@ from webapp.user.models import User
 from webapp.user.views import blueprint as user_blueprint
 
 
-
 def create_app():
     app = Flask(__name__)
     app.config.from_pyfile('config.py')
@@ -25,11 +24,9 @@ def create_app():
     app.register_blueprint(search_blueprint)
     app.register_blueprint(favorite_searches)
 
-
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(user_id)
-
 
     @app.route('/')
     def index():
