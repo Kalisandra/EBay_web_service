@@ -2,21 +2,27 @@
 
 {% block content %}
 <div class="row my-2">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-warning" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+</div>
+<div class="row my-2">
     <div class="col-2"></div>
     <div class="col-8">
     <form class="form-inline" method="GET">
         <div class="input-group input-group-lg">
             <input type="text" class="form-control" placeholder="Поиск" name="q" 
             value="{{ request.args.get('q', '') }}" required>
-        
             <select class="custom-select" name="categoryid">
-                <option value=""
-                {% if not request.args.get('categoryid', '') %} selected {% endif %}>Выберите категорию</option>
+                <option value="" {% if not request.args.get('categoryid', '') %} selected {% endif %}>Выберите категорию</option>
                 {% for category in categories %}
-                    <option
-                    {% if request.args.get('categoryid', '')== category.categoryid|string() %} selected {% endif %}
-                    value="{{category.categoryid}}">{{ category.categoryname }}
-                    </option>
+                    <option {% if request.args.get('categoryid', '')== category.categoryid|string() %} selected {% endif %} value="{{category.categoryid}}">{{ category.categoryname }}</option>
                 {% endfor %}
             </select>
             <button type="submit" class="btn btn-secondary btn-lg">Поиск</button>
@@ -27,39 +33,42 @@
 </div>
 
 {% if request.args.get('q') %}
-<!-- блок отображения выбранных фильтров -->
-{% if userfilterslist %}
-    <div class="row my-2">
-        <div class="col-2">
-        </div>
-        <div class="col-6">
-            <h5>Примененные фильтры</h5>
-            <div class="btn-group">
-                {% for filters in userfilterslist %}
-                    {% for value in filters.filter_values %}
-                        <a role="button" class="btn btn-primary mx-1" href="{{ url_for(
-                            'search.search',
-                            q=request.args.get('q', ''),
-                            categoryid=subcategoryid,
-                            filters=new_filters_request(request.args.get('filters', ''), value),
-                            ) }}">{{ value }}</a>
+    <!-- блок отображения выбранных фильтров -->
+    {% if userfilterslist %}
+        <div class="row my-2">
+            <div class="col-2"></div>
+            <div class="col-6">
+                <h5>Примененные фильтры</h5>
+                <div class="btn-group">
+                    {% for filters in userfilterslist %}
+                    <div class="my-1">
+                        {% for value in filters.filter_values %}
+                            <a role="button" class="btn btn-primary mx-1 my-1" href="{{ url_for(
+                                'search.search',
+                                q=request.args.get('q', ''),
+                                categoryid=subcategoryid,
+                                filters=new_filters_request(request.args.get('filters', ''), value),
+                                ) }}">{{ value }}</a>
+                        {% endfor%}
+                    </div>
                     {% endfor%}
-                {% endfor%}
+                </div>
+            </div>
+            <div class="col-4 mt-4">
+                <form action="{{ url_for('favorite_searches.add_to_favorite_searches') }}" class="form-inline" method="GET">
+                    <input type="hidden" name="q" value="{{ request.args.get('q', '') }}">
+                    <input type="hidden" name="categoryid" value="{{ subcategoryid }}">
+                    <input type="hidden" name="filters" value="{{ request.args.get('filters', '') }}">
+                    <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Имя запроса" name="query_name" 
+                    value="{{ request.args.get('query_name', '') }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Сохранить параметры поиска</button>
+                </form>
             </div>
         </div>
-        <div class="col-4">
-            <form action="{{ url_for('favorite_searches.add_to_favorite_searches') }}" class="form-inline" method="GET">
-                <input type="hidden" name="q" value="{{ request.args.get('q', '') }}">
-                <input type="hidden" name="categoryid" value="{{ subcategoryid }}">
-                <input type="hidden" name="filters" value="{{ request.args.get('filters', '') }}">
-                <input type="text" class="form-control" placeholder="Имя запроса" name="query_name" 
-                value="{{ request.args.get('query_name', '') }}">
-                <button type="submit" class="btn btn-secondary btn-lg">Сохранить поиск</button>
-            </form>
-        </div>
-    </div>
-{% endif%}
-<!-- конец блока отображения выбранных фильтров -->
+    {% endif%}
+    <!-- конец блока отображения выбранных фильтров -->
 
     <div class="row">
 <!-- меню фильтров -->
@@ -76,7 +85,7 @@
                         {% for values in aspect.aspect_data %}
                             <li class="form-check">
                                 <label class="form-check-label px-2">
-                                    <input type="checkbox" class="form-check-input" value="{{ values.value_name }}">{{ values.value_name }}: {{ values.count }}
+                                    <input type="checkbox" class="form-check-input" value="{{ values.value_name }}">{{ values.value_name }}: {{ values.count }} 
                                 </label>
                             </li>
                         {% endfor %}
@@ -84,7 +93,6 @@
                     </div>
                 {% endfor %}
             </div>
-            
             <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
                 'search.search',
                 q=request.args.get('q', ''),
@@ -96,15 +104,6 @@
 <!-- конец меню фильтров -->
         <div class="col-9">
         <h2>{{ title }}</h2>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <div class="alert alert-warning" role="alert">
-                {% for message in messages %}
-                    {{ message }}
-                {% endfor %}
-            </div>
-            {% endif %}
-        {% endwith %}
             {% for item in results %}
             <div class="card mb-3" >
                 <div class="row no-gutters">

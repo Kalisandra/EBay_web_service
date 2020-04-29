@@ -4,8 +4,7 @@ from bs4 import BeautifulSoup
 from flask import current_app
 from flask_login import current_user
 
-
-from webapp.user.models import db, User
+from webapp.user.models import db
 from webapp.utils import get_shopping_headers, post_ebay_request
 
 
@@ -36,8 +35,6 @@ def get_session_ID():
     return session_id
 
 
-
-
 def get_token_url():
     """Формирование ссылки, передаваемой пользователю, для получения Token"""
     session_id = get_session_ID()
@@ -47,8 +44,10 @@ def get_token_url():
 
 def get_token():
     """Запрос Token после плучения согласия пользователя"""
-    if current_user.session_id_status: # проверяем имеется ли у текущего пользователя записанный в базе session_id
-        session_id = current_user.session_id # получаем session id из баззы данных
+    # проверяем имеется ли у текущего пользователя записанный в базе session_id
+    if current_user.session_id_status:
+        # получаем session id из баззы данных
+        session_id = current_user.session_id
         headers = get_shopping_headers("FetchToken")
 
         data = f"""
@@ -58,15 +57,17 @@ def get_token():
         <SessionID>{session_id}</SessionID>
         </FetchTokenRequest>
         """
-        
         response_soup = post_ebay_request(headers, data)
         if response_soup.find('ack').text == 'Success':
             token = response_soup.find('ebayauthtoken').text
-            hard_expiration_time = response_soup.find('hardexpirationtime').text
+            hard_expiration_time = response_soup.find(
+                'hardexpirationtime').text
             # удаляем ненужные символы из 'hard_expiration_time'
-            hard_expiration_time = hard_expiration_time.replace('T', ' ').replace('Z', '')
+            hard_expiration_time = hard_expiration_time.replace(
+                'T', ' ').replace('Z', '')
             # преобразуем строку 'hard_expiration_time' в datetime
-            hard_expiration_time = datetime.strptime(hard_expiration_time, '%Y-%m-%d %H:%M:%S.%f')
+            hard_expiration_time = datetime.strptime(
+                hard_expiration_time, '%Y-%m-%d %H:%M:%S.%f')
 
             # записываем полученные данные в базу
             current_user.token = token
@@ -81,4 +82,3 @@ def get_token():
 
         else:
             return 'Пользователь не разрешил доступ'
-

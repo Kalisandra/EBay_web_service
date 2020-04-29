@@ -2,8 +2,11 @@ import isodate
 from flask_login import current_user
 
 from webapp.utils import (
-    get_finding_headers, get_shopping_headers, post_ebay_finding_request, post_ebay_request,
-)
+    get_finding_headers,
+    get_shopping_headers,
+    post_ebay_finding_request,
+    post_ebay_request,
+    )
 from webapp.ebay_search.models import db, Ebay_Categories
 
 
@@ -26,6 +29,7 @@ soup_keys = {
     'condition_display_name': 'conditiondisplayname',
 }
 
+
 def parsfield(item, value):
     parsed_item = item.find(value)
     if parsed_item and value == 'endtime':
@@ -41,9 +45,15 @@ def parsfield(item, value):
     return field_value
 
 
-def find_items_advanced(query, categiryid, page_number=1, user_filters_list=[]):
+def find_items_advanced(
+        query,
+        categiryid,
+        page_number=1,
+        user_filters_list=[],
+        ):
     """
-    Функция поиска товаров на Ebay по поисковому запросу и выбранной категории товаров
+    Функция поиска товаров на Ebay по поисковому запросу и
+    выбранной категории товаров
     """
     headers = get_finding_headers("findItemsAdvanced")
     if user_filters_list:
@@ -88,7 +98,8 @@ def find_items_advanced(query, categiryid, page_number=1, user_filters_list=[]):
     subcategory = histogram_container.find('domaindisplayname').text
     # получаем id подкатегории из базы данных
     # for categoryid in db.session.query(Ebay_Categories.categoryid).filter_by(categoryname=subcategory).first():
-    subcategory_id = db.session.query(Ebay_Categories.categoryid).filter_by(categoryname=subcategory).first().categoryid
+    subcategory_id = db.session.query(Ebay_Categories.categoryid).filter_by(
+        categoryname=subcategory).first().categoryid
 
     all_aspects = histogram_container.find_all('aspect')
     histogram_container_data = []
@@ -104,7 +115,8 @@ def find_items_advanced(query, categiryid, page_number=1, user_filters_list=[]):
             histogram_values_data.append(value_data)
         aspect_data['aspect_data'] = histogram_values_data
         histogram_container_data.append(aspect_data)
-    return search_result, total_pages, subcategory, subcategory_id, histogram_container_data
+    return (search_result, total_pages, subcategory, subcategory_id,
+            histogram_container_data)
 
 
 def get_item(item_id, token):
@@ -126,7 +138,6 @@ def get_item(item_id, token):
     pars_item = {}
     for key, value in soup_keys.items():
         pars_item[key] = parsfield(item, value)
-
     return pars_item
 
 
@@ -147,7 +158,8 @@ def add_to_watch_list(itemid):
     if response_soup.find('ack').text == 'Success':
         return print('Лот успешно добавлен в "Избранное"')
     else:
-        return print('Лот не добавлен в "Избранное". Результаты поиска устарели')
+        return print(
+            'Лот не добавлен в "Избранное". Результаты поиска устарели')
 
 
 def get_user_watch_list():
@@ -201,7 +213,7 @@ def remove_from_user_watch_list(itemid):
         return print('Лот успешно удален из списка избранных товаров')
     else:
         return print('Не получилось удалить лот из списка избоанных товаров.\
-            Обновите страниуц и повторите заново')
+            Обновите страницу и повторите заново')
 
 
 def get_user_filters_request(filters_request):
@@ -212,13 +224,15 @@ def get_user_filters_request(filters_request):
     filters_data.remove(filters_data[-1])
     user_filters_request = []
     for filters in filters_data:
-        filters = filters.replace('&', '&amp;').replace('"', '&quot;').replace("'", '&apos;')
+        filters = filters.replace(
+            '&', '&amp;').replace('"', '&quot;').replace("'", '&apos;')
         category_filters = {}
         one_category_filters = filters.split(':')
         category_filters['filter_name'] = one_category_filters[0]
         category_filters['filter_values'] = one_category_filters[1].split(',')
         user_filters_request.append(category_filters)
     return user_filters_request
+
 
 def make_filter_string_for_finding_request(user_filters_request):
     """
@@ -238,10 +252,12 @@ def make_filter_string_for_finding_request(user_filters_request):
 
 def delete_filter_from_request(user_filters_request, value):
     """
-    Функция удаляет фильтр из списка избранных фильтров пользователя по запросу с html
+    Функция удаляет фильтр из списка избранных фильтров пользователя
+    по запросу с html
     """
     for filters in user_filters_request:
-        if len(filters['filter_values']) == 1 and value in filters['filter_values']:
+        if len(filters['filter_values']) == 1 and (
+                value in filters['filter_values']):
             user_filters_request.remove(filters)
         elif value in filters['filter_values']:
             filters['filter_values'].remove(value)

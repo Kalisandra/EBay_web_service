@@ -14,4 +14,3 @@ headers = {
 def getting_api_call_name(call_name):
     headers["X-EBAY-API-CALL-NAME"] = call_name
     return headers
-

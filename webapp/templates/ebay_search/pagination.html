@@ -1,55 +1,74 @@
 <div class="row">
-    <nav aria-label="Search results pages">
-        <ul class="pagination">
-            {% if not pagenumber or pagenumber|int() == 1 %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Предыдущая</a>
-                </li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="{{ url_for(
+  <nav aria-label="Search results pages">
+    <ul class="pagination">
+      {% if not pagenumber or pagenumber|int() == 1 %}
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1" aria-disabled="true"
+          >Предыдущая</a
+        >
+      </li>
+      {% else %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="{{ url_for(
                     'search.search',
                     q=request.args.get('q', ''),
                     categoryid=request.args.get('categoryid', ''),
-                    pagenumber=(pagenumber|int() - 1)) }}">Предыдущая</a></li>
-            {% endif %}
-            {% for page in range(1, totalpages + 1) %}
-                {% if pagenumber|int() == page %}
-                    <li class="page-item active" aria-current="page">
-                        <a class="page-link" href="{{ url_for(
+                    pagenumber=(pagenumber|int() - 1)) }}"
+          >Предыдущая</a
+        >
+      </li>
+      {% endif %} {% for page in range(1, totalpages + 1) %} {% if
+      pagenumber|int() == page %}
+      <li class="page-item active" aria-current="page">
+        <a
+          class="page-link"
+          href="{{ url_for(
                             'search.search',
                             q=request.args.get('q', ''),
                             categoryid=request.args.get('categoryid', ''),
                             pagenumber=page,
                             filters=request.args.get('filters', ''),
-                            )}}">{{ page }}
-                        <span class="sr-only">(current)</span></a>
-                    </li>
-                {% else %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for(
+                            )}}"
+          >{{ page }} <span class="sr-only">(current)</span></a
+        >
+      </li>
+      {% else %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="{{ url_for(
                             'search.search',
                             q=request.args.get('q', ''),
                             categoryid=request.args.get('categoryid', ''),
                             pagenumber=page,
                             filters=request.args.get('filters', ''),
-                            )}}">{{ page }}
-                        </a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-            {% if pagenumber|int() == totalpages %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Следующая</a>
-                </li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="{{ url_for(
+                            )}}"
+          >{{ page }}
+        </a>
+      </li>
+      {% endif %} {% endfor %} {% if pagenumber|int() == totalpages %}
+      <li class="page-item disabled">
+        <a class="page-link" href="#" tabindex="-1" aria-disabled="true"
+          >Следующая</a
+        >
+      </li>
+      {% else %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="{{ url_for(
                     'search.search',
                     q=request.args.get('q', ''),
                     categoryid=request.args.get('categoryid', ''),
                     pagenumber=(pagenumber|int() + 1),
                     filters_request=request.args.get('filters', ''),
-                    ) }}">Следующая</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+                    ) }}"
+          >Следующая</a
+        >
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
 </div>
