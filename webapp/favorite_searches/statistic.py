@@ -31,10 +31,9 @@ def get_ebay_time(token):
 def get_item_to_statistic():
     """
     Функция запрашивает в базе 'Избранные поиски' статус ведения статистики, и если он активный
-    делает соответствующий поисковый запрос на Ebay и записывает в отдельную таблицу уникальные 
+    делает соответствующий поисковый запрос на Ebay и записывает в отдельную таблицу уникальные
     (не встречающиеся в базе) лоты
     """
-    print('1')
     # запрос к базе Favorite_searches для выборки избранных поисков 
     # с подключенным ведением статистики
     favorite_search_with_statistic = Favorite_searches.query.filter(
@@ -56,7 +55,7 @@ def get_item_to_statistic():
                 new_statistic_item = Statistic_items(
                     query_id=query_id,
                     item_id=item['item_id'],
-                    item_name = item['title'],
+                    item_name=item['title'],
                     item_current_price=item['item_current_price_converted'],
                     end_time=datetime.strptime(item['end_time'], '%Y-%m-%d %H:%M:%S'),
                     item_url=item['view_item_url'],
@@ -66,11 +65,30 @@ def get_item_to_statistic():
 
 
 def get_final_price():
+    """
+    Функция делает выборку лотов по таблице базы данных "statistic_items" не имеющих записи в 
+    поле "final_price".
+    Далее делает запрос времени Ebay (для каждого пользователя только один раз в рамках одного
+    запроса, чтобы уменьшить время работы функции) и если время Ebay больше времени завершения
+    аукциона делат запрос на Ebay об информации о лоте из которого получает итоговую цену и
+    количество ставок
+    """
     items_without_final_price = Statistic_items.query.filter(Statistic_items.final_price.is_(None))
+    current_user_token = ""
+    time = ""
     for item in items_without_final_price:
         user_token = item.favorite_searches.user.token
-        time = get_ebay_time(user_token)
-        if item.end_time < time:
-            pars_item = get_item(item.item_id, user_token)
-            item.final_price = pars_item['item_current_price_converted']
-            db.session.commit()
+        if current_user_token != user_token:
+            current_user_token = user_token
+            time = get_ebay_time(user_token)
+            if item.end_time < time:
+                pars_item = get_item(item.item_id, user_token)
+                item.final_price = pars_item['item_current_price_converted']
+                item.bids = pars_item['bid_count']
+                db.session.commit()
+        elif current_user_token == user_token:
+            if item.end_time < time:
+                pars_item = get_item(item.item_id, user_token)
+                item.final_price = pars_item['item_current_price_converted']
+                item.bids = pars_item['bid_count']
+                db.session.commit()

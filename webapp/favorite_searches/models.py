@@ -38,8 +38,9 @@ class Statistic_items(db.Model):
     item_name = db.Column(db.String(200), nullable=True)
     item_current_price = db.Column(db.String(10), nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
-    final_price = db.Column(db.String(10), nullable=True)
+    final_price = db.Column(db.Integer, nullable=True)
     item_url = db.Column(db.String(200), nullable=False)
+    bids = db.Column(db.Integer, nullable=True)
     favorite_searches = relationship('Favorite_searches', backref='statistic_items')
 
 

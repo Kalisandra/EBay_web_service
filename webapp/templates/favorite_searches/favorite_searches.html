@@ -5,7 +5,7 @@
         <h3>"Избранные поиски"</h3>
         {% for user_search in favorite_searches_list %}
             <div class="card">
-                <div class="card-body">
+                <div class="card-body py-1">
                     <p class="card-text my-1">Название поиска: {{ user_search.query_name }}</p>
                     <p class="card-text my-1">Поисковый запрос: {{ user_search.user_query }}</p>
                     <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
@@ -24,6 +24,8 @@
                         <a href="{{ url_for('favorite_searches.add_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-warning" role="button">Включить сбор статистики цен</a>
                     {% else %}
                         <a href="{{ url_for('favorite_searches.stop_statistic', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Выключить сбор статистики цен</a>
+                        <a href="{{ url_for('favorite_searches.visualize_statistics', id=user_search.id) }}" target="_blank" class="btn btn-outline-danger" role="button">Показать статистику цен</a>
+                        <p class="card-text my-1">Сбор статистики цен включен до: {{ user_search.statistic_start_date }}</p>
                     {% endif %}
                 </div>
             </div>

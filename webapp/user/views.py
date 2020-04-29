@@ -12,8 +12,8 @@ blueprint = Blueprint('user', __name__, url_prefix='/users')
 @blueprint.route('/')
 def login():
     if current_user.is_authenticated and current_user.session_id_status \
-        and current_user.token is None:
-        return redirect(url_for('user.redirect_user'))
+            and current_user.token is None:
+        return redirect(url_for('user.redirect_user')) 
     elif current_user.is_authenticated and current_user.token:
         return redirect(url_for('search.search'))
     else:
