@@ -5,7 +5,8 @@ from sqlalchemy.orm import relationship
 from webapp.model import db
 
 
-class Favorite_searches(db.Model):
+class FavoriteSearches(db.Model):
+    __tablename__ = 'favorite_searches'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(
         db.Integer,
@@ -30,7 +31,8 @@ class Favorite_searches(db.Model):
             self.user_id, self.user_query, self.filter_request)
 
 
-class Statistic_items(db.Model):
+class StatisticItems(db.Model):
+    __tablename__ = 'statistic_items'
     id = db.Column(db.Integer, primary_key=True)
     query_id = db.Column(
         db.Integer,
@@ -46,7 +48,7 @@ class Statistic_items(db.Model):
     item_url = db.Column(db.String(200), nullable=False)
     bids = db.Column(db.Integer, nullable=True)
     favorite_searches = relationship(
-        'Favorite_searches',
+        'FavoriteSearches',
         backref='statistic_items',
         )
 

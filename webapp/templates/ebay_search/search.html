@@ -22,7 +22,7 @@
             <select class="custom-select" name="categoryid">
                 <option value="" {% if not request.args.get('categoryid', '') %} selected {% endif %}>Выберите категорию</option>
                 {% for category in categories %}
-                    <option {% if request.args.get('categoryid', '')== category.categoryid|string() %} selected {% endif %} value="{{category.categoryid}}">{{ category.categoryname }}</option>
+                    <option {% if request.args.get('categoryid', '')== category.category_id|string() %} selected {% endif %} value="{{category.category_id}}">{{ category.category_name }}</option>
                 {% endfor %}
             </select>
             <button type="submit" class="btn btn-secondary btn-lg">Поиск</button>

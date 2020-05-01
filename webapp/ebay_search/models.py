@@ -1,13 +1,15 @@
 from webapp.model import db
 
 
-class Ebay_Categories(db.Model):
+class EbayCategories(db.Model):
+    __tablename__ = 'ebay_categories'
     id = db.Column(db.Integer, primary_key=True)
-    categoryname = db.Column(db.String(50), nullable=False)
-    categorylevel = db.Column(db.Integer, nullable=False)
-    categoryid = db.Column(db.Integer, unique=True, nullable=False)
-    categoryparentid = db.Column(db.Integer)
+    category_name = db.Column('categoryname', db.String(50), nullable=False)
+    category_level = db.Column('categorylevel', db.Integer, nullable=False)
+    category_id = db.Column(
+        'categoryid', db.Integer, unique=True, nullable=False)
+    categoryparent_id = db.Column('categoryparentid', db.Integer)
 
     def __repr__(self):
-        return '<categoryname={} categoryid={}>'.format(
-            self.categoryname, self.categoryid)
+        return '<category_name={} category_id={}>'.format(
+            self.category_name, self.category_id)

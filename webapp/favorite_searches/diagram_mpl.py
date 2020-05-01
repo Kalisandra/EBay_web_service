@@ -9,14 +9,14 @@ from datetime import datetime, timedelta
 # import matplotlib.dates as mdates
 # import datetime as dt
 
-from webapp.favorite_searches.models import Statistic_items
+from webapp.favorite_searches.models import StatisticItems
 
 
 def plot_statistics(query_id):
-    items_list = Statistic_items.query.filter(
-        Statistic_items.query_id == query_id,
-        Statistic_items.final_price.isnot(None)).order_by(
-            Statistic_items.end_time.asc()).all()
+    items_list = StatisticItems.query.filter(
+        StatisticItems.query_id == query_id,
+        StatisticItems.final_price.isnot(None)).order_by(
+            StatisticItems.end_time.asc()).all()
     x_data = []
     y_data = []
     bids_data = []

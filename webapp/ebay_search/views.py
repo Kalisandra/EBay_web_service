@@ -4,7 +4,7 @@ from webapp.ebay_search.find_items import (
     find_items_advanced, add_to_watch_list, get_user_watch_list,
     remove_from_user_watch_list, get_user_filters_request,
 )
-from webapp.ebay_search.models import Ebay_Categories
+from webapp.ebay_search.models import EbayCategories
 from webapp.user.decorators import user_required
 
 
@@ -15,8 +15,8 @@ blueprint = Blueprint('search', __name__, url_prefix='/search')
 @user_required
 def search():
     # получаем категории товаров Ebay из базы данных
-    categories = Ebay_Categories.query.filter(
-        Ebay_Categories.categorylevel == 1)
+    categories = EbayCategories.query.filter(
+        EbayCategories.category_level == 1)
     # получаем результаты запроса от пользователя из поисковой строки
     q = request.args.get('q')
     # получаем выбранную категорию со страницы поиска

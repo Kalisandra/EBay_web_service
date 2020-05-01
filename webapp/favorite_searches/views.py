@@ -6,7 +6,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from webapp import db
 from webapp.favorite_searches.diagram_mpl import plot_statistics
-from webapp.favorite_searches.models import Favorite_searches, Statistic_items
+from webapp.favorite_searches.models import FavoriteSearches, StatisticItems
 from webapp.user.decorators import user_required
 
 
@@ -17,9 +17,9 @@ blueprint = Blueprint(
 @blueprint.route('/')
 @user_required
 def open_favorite_searches():
-    favorite_searches_list = Favorite_searches.query.filter(
-        Favorite_searches.user_id == current_user.id).order_by(
-            Favorite_searches.date_of_creation.desc()).all()
+    favorite_searches_list = FavoriteSearches.query.filter(
+        FavoriteSearches.user_id == current_user.id).order_by(
+            FavoriteSearches.date_of_creation.desc()).all()
 
     return render_template(
         'favorite_searches/favorite_searches.html',
@@ -42,10 +42,10 @@ def add_to_favorite_searches():
     # получаем имя сохраненного поискового запроса
     query_name = request.args.get('query_name')
 
-    user_query_exists = Favorite_searches.query.filter(
-        Favorite_searches.user_query == q).count()
+    user_query_exists = FavoriteSearches.query.filter(
+        FavoriteSearches.user_query == q).count()
     if not user_query_exists:
-        new_user_query = Favorite_searches(
+        new_user_query = FavoriteSearches(
             user_id=current_user.id,
             query_name=query_name,
             user_query=q,
@@ -63,8 +63,8 @@ def add_to_favorite_searches():
 def remove_from_favorite_searches():
     search_id = request.args.get('id')
     if search_id:
-        favorite_search = Favorite_searches.query.filter(
-            Favorite_searches.id == search_id).first()
+        favorite_search = FavoriteSearches.query.filter(
+            FavoriteSearches.id == search_id).first()
         db.session.delete(favorite_search)
         db.session.commit()
         title = "Поиск успешно удален из 'Избранных поисков'"
@@ -76,8 +76,8 @@ def remove_from_favorite_searches():
 def add_statistic():
     search_id = request.args.get('id')
     if search_id:
-        favorite_search = Favorite_searches.query.filter(
-            Favorite_searches.id == search_id).first()
+        favorite_search = FavoriteSearches.query.filter(
+            FavoriteSearches.id == search_id).first()
         favorite_search.statistic_status = True
         favorite_search.statistic_start_date = datetime.now()
         db.session.commit()
@@ -90,8 +90,8 @@ def add_statistic():
 def stop_statistic():
     search_id = request.args.get('id')
     if search_id:
-        favorite_search = Favorite_searches.query.filter(
-            Favorite_searches.id == search_id).first()
+        favorite_search = FavoriteSearches.query.filter(
+            FavoriteSearches.id == search_id).first()
         favorite_search.statistic_status = False
         favorite_search.statistic_start_date = None
         db.session.commit()
@@ -103,8 +103,8 @@ def stop_statistic():
 @blueprint.route('/visualize_statistics')
 def visualize_statistics():
     query_id = request.args.get('id')
-    items_list = Statistic_items.query.filter(
-        Statistic_items.query_id == query_id, Statistic_items.final_price.isnot(None)).order_by(Statistic_items.end_time.asc()).all()
+    items_list = StatisticItems.query.filter(
+        StatisticItems.query_id == query_id, StatisticItems.final_price.isnot(None)).order_by(StatisticItems.end_time.asc()).all()
     diagram = plot_statistics(query_id)
     output = io.BytesIO()
     diagram = FigureCanvas(diagram).print_png(output)
@@ -115,5 +115,5 @@ def visualize_statistics():
 
 
 
-    # items_list = Statistic_items.query.filter(
-        # Statistic_items.query_id == search_id).filter(Statistic_items.end_time.is_not_(None)).order_by(Statistic_items.end_time.asc()).all()
+    # items_list = StatisticItems.query.filter(
+        # StatisticItems.query_id == search_id).filter(StatisticItems.end_time.is_not_(None)).order_by(StatisticItems.end_time.asc()).all()

@@ -9,7 +9,7 @@ from webapp.ebay_search.find_items import (
     get_user_filters_request,
     get_item
     )
-from webapp.favorite_searches.models import Favorite_searches, Statistic_items
+from webapp.favorite_searches.models import FavoriteSearches, StatisticItems
 from webapp.utils import get_shopping_headers, post_ebay_request
 
 
@@ -39,26 +39,26 @@ def get_item_to_statistic():
     если он активный, делает соответствующий поисковый запрос на Ebay и
     записывает в отдельную таблицу уникальные (не встречающиеся в базе) лоты
     """
-    # запрос к базе Favorite_searches для выборки избранных поисков
+    # запрос к базе FavoriteSearches для выборки избранных поисков
     # с подключенным ведением статистики
-    favorite_search_with_statistic = Favorite_searches.query.filter(
-        Favorite_searches.statistic_status == True).all()
+    favorite_search_with_statistic = FavoriteSearches.query.filter(
+        FavoriteSearches.statistic_status == True).all()
     for search in favorite_search_with_statistic:
         # проверяем дату активации начала статистики
         if search.statistic_start_date + timedelta(days=7) > datetime.now():
             # направляем поисковый запрос на Ebay
             query_id = search.id
             query = search.user_query
-            categiryid = search.chosen_categoryid
+            categoryid = search.chosen_categoryid
             user_filters_list = get_user_filters_request(search.filter_request)
             search_result = find_items_advanced(
-                query, categiryid, user_filters_list=user_filters_list)[0]
+                query, categoryid, user_filters_list=user_filters_list)[0]
         # Записываем уникальные лоты в отдельную таблицу в базе
         for item in search_result:
-            item_exists = Statistic_items.query.filter(
-                Statistic_items.item_id == item['item_id']).count()
+            item_exists = StatisticItems.query.filter(
+                StatisticItems.item_id == item['item_id']).count()
             if not item_exists:
-                new_statistic_item = Statistic_items(
+                new_statistic_item = StatisticItems(
                     query_id=query_id,
                     item_id=item['item_id'],
                     item_name=item['title'],
@@ -72,7 +72,7 @@ def get_item_to_statistic():
 
 
 def get_final_price():
-    items_without_final_price = Statistic_items.query.filter(Statistic_items.final_price.is_(None))
+    items_without_final_price = StatisticItems.query.filter(StatisticItems.final_price.is_(None))
     for item in items_without_final_price:
         user_token = item.favorite_searches.user.token
         time = get_ebay_time(user_token)

@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from bs4 import BeautifulSoup
 from flask import current_app
 from flask_login import current_user
 

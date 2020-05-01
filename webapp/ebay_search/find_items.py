@@ -1,13 +1,13 @@
 import isodate
 from flask_login import current_user
 
+from webapp.ebay_search.models import db, EbayCategories
 from webapp.utils import (
     get_finding_headers,
     get_shopping_headers,
     post_ebay_finding_request,
     post_ebay_request,
-    )
-from webapp.ebay_search.models import db, Ebay_Categories
+)
 
 
 soup_keys = {
@@ -30,7 +30,7 @@ soup_keys = {
 }
 
 
-def parsfield(item, value):
+def parse_field(item, value):
     parsed_item = item.find(value)
     if parsed_item and value == 'endtime':
         field_value = parsed_item.text
@@ -47,9 +47,9 @@ def parsfield(item, value):
 
 def find_items_advanced(
         query,
-        categiryid,
+        categoryid,
         page_number=1,
-        user_filters_list=[],
+        user_filters_list=None,
         ):
     """
     Функция поиска товаров на Ebay по поисковому запросу и
@@ -62,7 +62,7 @@ def find_items_advanced(
         filters = None
     data = f"""
     <findItemsAdvancedRequest xmlns="http://www.ebay.com/marketplace/search/v1/services">
-        <categoryId>{categiryid}</categoryId>
+        <categoryId>{categoryid}</categoryId>
         <outputSelector>AspectHistogram</outputSelector>
         <descriptionSearch>true</descriptionSearch>
         <keywords>{query}</keywords>
@@ -90,16 +90,15 @@ def find_items_advanced(
     for item in all_items:
         pars_item = {}
         for key, value in soup_keys.items():
-            pars_item[key] = parsfield(item, value)
+            pars_item[key] = parse_field(item, value)
         search_result.append(pars_item)
 
     # Обрабатываем фильтры для уточнения поискового запроса
     histogram_container = response_soup.find('aspecthistogramcontainer')
     subcategory = histogram_container.find('domaindisplayname').text
     # получаем id подкатегории из базы данных
-    # for categoryid in db.session.query(Ebay_Categories.categoryid).filter_by(categoryname=subcategory).first():
-    subcategory_id = db.session.query(Ebay_Categories.categoryid).filter_by(
-        categoryname=subcategory).first().categoryid
+    subcategory_id = db.session.query(EbayCategories.category_id).filter_by(
+        category_name=subcategory).first().category_id
 
     all_aspects = histogram_container.find_all('aspect')
     histogram_container_data = []
@@ -137,7 +136,7 @@ def get_item(item_id, token):
     item = response_soup.find('item')
     pars_item = {}
     for key, value in soup_keys.items():
-        pars_item[key] = parsfield(item, value)
+        pars_item[key] = parse_field(item, value)
     return pars_item
 
 
@@ -186,7 +185,7 @@ def get_user_watch_list():
         for item in all_items:
             pars_watch_item = {}
             for key, value in soup_keys.items():
-                pars_watch_item[key] = parsfield(item, value)
+                pars_watch_item[key] = parse_field(item, value)
             user_watch_list.append(pars_watch_item)
         return user_watch_list
 
@@ -221,6 +220,8 @@ def get_user_filters_request(filters_request):
     Функция преобразует фильтры из поискового запроса в список
     """
     filters_data = filters_request.split(';')
+    # filters_request заканчивается на ";", поэтому последним элементом списка
+    # является, который нужно удалить
     filters_data.remove(filters_data[-1])
     user_filters_request = []
     for filters in filters_data:
