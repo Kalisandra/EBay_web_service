@@ -93,9 +93,8 @@ def get_final_price():
                 item.final_price = pars_item['item_current_price_converted']
                 item.bids = pars_item['bid_count']
                 db.session.commit()
-        elif current_user_token == user_token:
-            if item.end_time < time:
-                pars_item = get_item(item.item_id, user_token)
-                item.final_price = pars_item['item_current_price_converted']
-                item.bids = pars_item['bid_count']
-                db.session.commit()
+        elif current_user_token == user_token and item.end_time < time:
+            pars_item = get_item(item.item_id, user_token)
+            item.final_price = pars_item['item_current_price_converted']
+            item.bids = pars_item['bid_count']
+            db.session.commit()
