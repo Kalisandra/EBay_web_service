@@ -25,4 +25,3 @@ def final_price_info():
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(crontab(hour='*/1'), get_statistic_data.s())
     sender.add_periodic_task(crontab(hour='*/1'), final_price_info.s())
-

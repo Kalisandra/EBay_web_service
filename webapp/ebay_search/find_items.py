@@ -49,8 +49,7 @@ def find_items_advanced(
         query,
         categoryid,
         page_number=1,
-        user_filters_list=None,
-        ):
+        user_filters_list=None):
     """
     Функция поиска товаров на Ebay по поисковому запросу и
     выбранной категории товаров
@@ -93,29 +92,34 @@ def find_items_advanced(
             pars_item[key] = parse_field(item, value)
         search_result.append(pars_item)
 
-    # Обрабатываем фильтры для уточнения поискового запроса
-    histogram_container = response_soup.find('aspecthistogramcontainer')
-    subcategory = histogram_container.find('domaindisplayname').text
-    # получаем id подкатегории из базы данных
-    subcategory_id = db.session.query(EbayCategories.category_id).filter_by(
-        category_name=subcategory).first().category_id
+    if response_soup.find('aspecthistogramcontainer'):
+        # Обрабатываем фильтры для уточнения поискового запроса
+        histogram_container = response_soup.find('aspecthistogramcontainer')
+        subcategory = histogram_container.find('domaindisplayname').text
+        # получаем id подкатегории из базы данных
+        subcategory_id = db.session.query(
+            EbayCategories.category_id).filter_by(category_name=subcategory).first().category_id
 
-    all_aspects = histogram_container.find_all('aspect')
-    histogram_container_data = []
-    for aspect in all_aspects:
-        aspect_data = {}
-        aspect_data['aspect_name'] = aspect['name']
-        histogram_values = aspect.find_all('valuehistogram')
-        histogram_values_data = []
-        for value in histogram_values:
-            value_data = {}
-            value_data['value_name'] = value['valuename']
-            value_data['count'] = value.find('count').text
-            histogram_values_data.append(value_data)
-        aspect_data['aspect_data'] = histogram_values_data
-        histogram_container_data.append(aspect_data)
-    return (search_result, total_pages, subcategory, subcategory_id,
-            histogram_container_data)
+        all_aspects = histogram_container.find_all('aspect')
+        histogram_container_data = []
+        for aspect in all_aspects:
+            aspect_data = {}
+            aspect_data['aspect_name'] = aspect['name']
+            histogram_values = aspect.find_all('valuehistogram')
+            histogram_values_data = []
+            for value in histogram_values:
+                value_data = {}
+                value_data['value_name'] = value['valuename']
+                value_data['count'] = value.find('count').text
+                histogram_values_data.append(value_data)
+            aspect_data['aspect_data'] = histogram_values_data
+            histogram_container_data.append(aspect_data)
+    else:
+        subcategory_id = categoryid
+        subcategory = EbayCategories.query.filter_by(
+            category_id=subcategory_id).first().category_name
+        histogram_container_data = []
+    return search_result, total_pages, subcategory, subcategory_id, histogram_container_data
 
 
 def get_item(item_id, token):

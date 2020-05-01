@@ -1,18 +1,32 @@
-{% extends "base.html" %} {% block content %} {% if items_list %}
-<h3>Завершенные аукционы:</h3>
-<img src="/plot.png" alt="my plot" />
-{% for item in items_list %}
-<div class="card">
-  <div class="card-body">
-    <a href="{{ item.item_url }}" target="_blank" role="button"
-      >{{ item.item_name }}</a
-    >
-    <p class="card-text my-1">Время завершения аукциона: {{ item.end_time }}</p>
-    <p class="card-text my-1">Итоговая цена: {{ item.final_price }} USD</p>
-  </div>
-</div>
-{% endfor %} {% else %}
-<h3>
-  По данному запросу пока нет завершенных аукционов для сбора статистики цен
-</h3>
-{% endif %} {% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+    {% if items_list %}
+        <div class="mt-2">
+            <h3>Завершенные аукционы:</h3>
+        </div>
+        <div class="row mt-1 mb-5">
+            <div class="col-12">
+                <img src="/favorite_searches/visualize_diagram?id={{ query_id }}" alt="my plot">
+            </div>
+        </div>
+        <div class="row mt-1 mb-5">
+            <div class="col-12">
+                <img src="/favorite_searches/visualize_histogram?id={{ query_id }}" alt="my plot">
+            </div>
+        </div>
+        {% for item in items_list %}
+            <div class="card">
+                <div class="card-body">
+                    <a href="{{ item.item_url }}" target="_blank" role="button">{{ item.item_name }}</a>
+                    <p class="card-text my-1">Время завершения аукциона: {{ item.end_time }}</p>
+                    <p class="card-text my-1">Итоговая цена: {{ item.final_price }} USD</p>
+                    <p class="card-text my-1">Количество ставок: {{ item.bids }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h3>По данному запросу пока нет завершенных аукционов для сбора статистики цен</h3>
+    {% endif %}
+{% endblock %}
+

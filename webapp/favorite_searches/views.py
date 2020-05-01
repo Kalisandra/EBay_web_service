@@ -5,7 +5,7 @@ from flask_login import current_user
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from webapp import db
-from webapp.favorite_searches.diagram_mpl import plot_statistics
+from webapp.favorite_searches.diagram_mpl import plot_statistics, plot_histogram
 from webapp.favorite_searches.models import FavoriteSearches, StatisticItems
 from webapp.user.decorators import user_required
 
@@ -24,7 +24,7 @@ def open_favorite_searches():
     return render_template(
         'favorite_searches/favorite_searches.html',
         favorite_searches_list=favorite_searches_list
-        )
+    )
 
 
 @blueprint.route('/add_to_favorite_searches')
@@ -51,7 +51,7 @@ def add_to_favorite_searches():
             user_query=q,
             chosen_categoryid=chosen_categoryid,
             filter_request=filters_request,
-            )
+        )
         db.session.add(new_user_query)
         db.session.commit()
 
@@ -83,7 +83,7 @@ def add_statistic():
         db.session.commit()
         title = "Сбор статистики цен включен"
         return render_template(
-            'favorite_searches/favorite_searches_action.html', title=title)  
+            'favorite_searches/favorite_searches_action.html', title=title)
 
 
 @blueprint.route('/stop_statistic')
@@ -104,16 +104,27 @@ def stop_statistic():
 def visualize_statistics():
     query_id = request.args.get('id')
     items_list = StatisticItems.query.filter(
-        StatisticItems.query_id == query_id, StatisticItems.final_price.isnot(None)).order_by(StatisticItems.end_time.asc()).all()
+        StatisticItems.query_id == query_id, StatisticItems.final_price.isnot(None)).order_by(
+            StatisticItems.end_time.asc()).all()
+    return render_template(
+        'favorite_searches/visualize_statistics.html',
+        items_list=items_list,
+        query_id=query_id)
+
+
+@blueprint.route('/visualize_diagram')
+def visualize_diagram():
+    query_id = request.args.get('id')
     diagram = plot_statistics(query_id)
     output = io.BytesIO()
     diagram = FigureCanvas(diagram).print_png(output)
-    # return render_template('favorite_searches/visualize_statistics.html', items_list=items_list, diagram=diagram)
-
     return Response(output.getvalue(), mimetype='image/png')
 
 
-
-
-    # items_list = StatisticItems.query.filter(
-        # StatisticItems.query_id == search_id).filter(StatisticItems.end_time.is_not_(None)).order_by(StatisticItems.end_time.asc()).all()
+@blueprint.route('/visualize_histogram')
+def visualize_histogram():
+    query_id = request.args.get('id')
+    histogram = plot_histogram(query_id)
+    output = io.BytesIO()
+    histogram = FigureCanvas(histogram).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')

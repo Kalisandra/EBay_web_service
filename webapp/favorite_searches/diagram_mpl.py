@@ -3,11 +3,9 @@ from matplotlib import dates as mpl_dates
 
 from datetime import datetime, timedelta
 
-
-# import matplotlib as mpl
-# import matplotlib.pyplot as plt
-# import matplotlib.dates as mdates
-# import datetime as dt
+from matplotlib import pyplot as plt
+from matplotlib import dates as mpl_dates
+from matplotlib.figure import Figure
 
 from webapp.favorite_searches.models import StatisticItems
 
@@ -28,51 +26,39 @@ def plot_statistics(query_id):
     colors = bids_data
 
     plt.style.use('seaborn')
-    fig = plt.figure()
+    fig = Figure(figsize=(12, 5))
     axis = fig.add_subplot(1, 1, 1)
-    axis.scatter(x_data, y_data, c=colors, cmap='Reds', edgecolor='black', linewidths=1)
-    plt.gcf().autofmt_xdate()
-    date_format = mpl_dates.DateFormatter('%d-%m-%Y %H:%M')
-    plt.gca().xaxis.set_major_formatter(date_format)
-    plt.title('Статистика цен по запросу')
-    plt.xlabel('Время завершения аукциона')
-    plt.ylabel('Итоговая цена, USD')
+    im = axis.scatter(x_data, y_data, c=colors, cmap='Reds', edgecolor='black', linewidths=1)
+    cbar = fig.colorbar(im)
+    cbar.ax.set_ylabel('Количество ставок')
 
-    # cbar = plt.colorbar()
-    # cbar.set_label('Количество ставок')
+    axis.set_title('Статистика цен по запросу', fontdict={'fontsize': 20, 'fontweight': 'medium'})
+    axis.set_xlabel('Время завершения аукциона, часовой пояс GMT', fontsize=12)
+    axis.set_ylabel('Итоговая цена, USD', fontsize=12)
+    fig.autofmt_xdate()
+    date_format = mpl_dates.DateFormatter('%d-%m-%Y %H:%M')
+    axis.xaxis.set_major_formatter(date_format)
+    fig.tight_layout()
     return fig
 
 
+def plot_histogram(query_id):
+    items_list = StatisticItems.query.filter(
+        StatisticItems.query_id == query_id,
+        StatisticItems.final_price.isnot(None)).order_by(
+            StatisticItems.end_time.asc()).all()
+    final_prices = []
+    for item in items_list:
+        final_prices.append(item.final_price)
 
+    plt.style.use('seaborn')
+    fig = Figure(figsize=(10, 5))
+    axis = fig.add_subplot(1, 1, 1)
+    im = axis.hist(final_prices, bins=8, edgecolor='black')
 
-    # plt.style.use('seaborn')
-    # plt.scatter(x_data, y_data, c=colors, cmap='Reds', edgecolor='black', linewidths=1)
-
-
-
-
-
-    # plt.plot_date(x_data, y_data)
-
-    plt.gcf().autofmt_xdate()
-    date_format = mpl_dates.DateFormatter('%d-%m-%Y %H:%M')
-    plt.gca().xaxis.set_major_formatter(date_format)
-    # plt.tight_layout()
-    plt.show()
-    # return plt.savefig("diagram.png")
-
-
-
-
-# np.random.seed(19680801)
-# data = np.random.randn(2, 100)
-
-# fig, axs = plt.subplots(2, 2, figsize=(5, 5))
-# axs[0, 0].hist(data[0])
-# axs[1, 0].scatter(data[0], data[1])
-# axs[0, 1].plot(data[0], data[1])
-# axs[1, 1].hist2d(data[0], data[1])
-
-# plt.show()
-
-# data_date = statistic_data.query.filter(final_price==True, filter_by(end_time)
+    axis.set_title('Статистика цен по запросу', fontdict={'fontsize': 20, 'fontweight': 'medium'})
+    axis.set_xlabel('Итоговая цена, USD', fontsize=12)
+    axis.set_ylabel('Количество лотов', fontsize=12)
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    return fig
