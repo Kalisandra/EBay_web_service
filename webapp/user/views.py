@@ -70,10 +70,9 @@ def recieve_user_token():
     # после подтверждения пользователем допуска к своим данным Ebay,
     # он перенаправляется на домашнюю страницу,
     # где запускается функция получения токена
-    if (current_user.is_authenticated
-            and current_user.session_id_status and
-            (not current_user.token or
-            current_user.hard_expiration_time < datetime.now())):
+    user_token_status_invalid = current_user.session_id_status and\
+        not current_user.token or current_user.hard_expiration_time < datetime.now()
+    if current_user.is_authenticated and user_token_status_invalid:
         get_token()
         if current_user.token_status:
             title = "Вы успешно подключили ваш Ebay-аккаунт"

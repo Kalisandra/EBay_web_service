@@ -1,184 +1,239 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="row my-2">
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div class="alert alert-warning" role="alert">
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
-        </div>
-        {% endif %}
-    {% endwith %}
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <div class="alert alert-warning" role="alert">
+    {% for message in messages %} {{ message }} {% endfor %}
+  </div>
+  {% endif %} {% endwith %}
 </div>
 <div class="row my-2">
-    <div class="col-2"></div>
-    <div class="col-8">
+  <div class="col-2"></div>
+  <div class="col-8">
     <form class="form-inline" method="GET">
-        <div class="input-group input-group-lg">
-            <input type="text" class="form-control" placeholder="Поиск" name="q" 
-            value="{{ request.args.get('q', '') }}" required>
-            <select class="custom-select" name="categoryid">
-                <option value="" {% if not request.args.get('categoryid', '') %} selected {% endif %}>Выберите категорию</option>
-                {% for category in categories %}
-                    <option {% if request.args.get('categoryid', '')== category.categoryid|string() %} selected {% endif %} value="{{category.categoryid}}">{{ category.categoryname }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-secondary btn-lg">Поиск</button>
-        </div>
-    </form>
-    </div>
-    <div class="col-2"></div>
+      <div class="input-group input-group-lg">
+        <input type="text" class="form-control" placeholder="Поиск" name="q" 
+          value="{{ request.args.get('q', '') }}" required>
+          <select class="custom-select" name="categoryid" required>
+              <option value="" {% if not request.args.get(
+                'categoryid', '') %} selected {% endif %}>
+                  Выберите категорию</option>
+              {% for category in categories %}
+                  <option {% if request.args.get(
+                    'categoryid', '')== category.category_id|string() %} selected {% endif %}
+                    value="{{category.category_id}}">
+                    {{ category.category_name }}</option>
+              {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-secondary btn-lg">Поиск</button>
+      </div>
+  </form>
+  </div>
+  <div class="col-2"></div>
 </div>
 
 {% if request.args.get('q') %}
-    <!-- блок отображения выбранных фильтров -->
-    {% if userfilterslist %}
-        <div class="row my-2">
-            <div class="col-2"></div>
-            <div class="col-6">
-                <h5>Примененные фильтры</h5>
-                <div class="btn-group">
-                    {% for filters in userfilterslist %}
-                    <div class="my-1">
-                        {% for value in filters.filter_values %}
-                            <a role="button" class="btn btn-primary mx-1 my-1" href="{{ url_for(
-                                'search.search',
-                                q=request.args.get('q', ''),
-                                categoryid=subcategoryid,
-                                filters=new_filters_request(request.args.get('filters', ''), value),
-                                ) }}">{{ value }}</a>
-                        {% endfor%}
-                    </div>
-                    {% endfor%}
-                </div>
-            </div>
-            <div class="col-4 mt-4">
-                <form action="{{ url_for('favorite_searches.add_to_favorite_searches') }}" class="form-inline" method="GET">
-                    <input type="hidden" name="q" value="{{ request.args.get('q', '') }}">
-                    <input type="hidden" name="categoryid" value="{{ subcategoryid }}">
-                    <input type="hidden" name="filters" value="{{ request.args.get('filters', '') }}">
-                    <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Имя запроса" name="query_name" 
-                    value="{{ request.args.get('query_name', '') }}">
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-2">Сохранить параметры поиска</button>
-                </form>
-            </div>
-        </div>
-    {% endif%}
-    <!-- конец блока отображения выбранных фильтров -->
+<!-- блок отображения выбранных фильтров -->
+{% if userfilterslist %}
+<div class="row my-2">
+  <div class="col-2"></div>
+  <div class="col-6">
+    <h5>Примененные фильтры</h5>
+    <div class="btn-group">
+      {% for filters in userfilterslist %}
+      <div class="my-1">
+        {% for value in filters.filter_values %}
+        <a
+          role="button"
+          class="btn btn-primary mx-1 my-1"
+          href="{{ url_for(
+                          'search.search',
+                          q=request.args.get('q', ''),
+                          categoryid=subcategoryid,
+                          filters=new_filters_request(request.args.get('filters', ''), value),
+                          ) }}"
+          >{{ value }}</a
+        >
+        {% endfor%}
+      </div>
+      {% endfor%}
+    </div>
+  </div>
+  <div class="col-4 mt-4">
+    <form
+      action="{{ url_for('favorite_searches.add_to_favorite_searches') }}"
+      class="form-inline"
+      method="GET"
+      target="_blank"
+    >
+      <input type="hidden" name="q" value="{{ request.args.get('q', '') }}" />
+      <input type="hidden" name="categoryid" value="{{ subcategoryid }}" />
+      <input
+        type="hidden"
+        name="filters"
+        value="{{ request.args.get('filters', '') }}"
+      />
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Имя запроса"
+          name="query_name"
+          value="{{ request.args.get('query_name', '') }}"
+        />
+      </div>
+      <button type="submit" class="btn btn-primary mt-2">
+        Сохранить параметры поиска
+      </button>
+    </form>
+  </div>
+</div>
+{% endif%}
+<!-- конец блока отображения выбранных фильтров -->
 
-    <div class="row">
-<!-- меню фильтров -->
-        <div class="col-3">
-            <h5>Фильтры</h5>
-            <h5 name="subcategoryid" value="subcategory_id">Подкатегория: {{ subcategory }}</h5>
-            <div class="dropdown">
-                {% for aspect in histogram_container_data %}
-                    <div class="my-1">
-                        <button type="button" class="btn btn-info dropdown-toggle btn-block" data-toggle="dropdown" value="{{ aspect.aspect_name }}">
-                            {{ aspect.aspect_name }}
-                        </button>
-                        <div class="dropdown-menu">
-                        {% for values in aspect.aspect_data %}
-                            <li class="form-check">
-                                <label class="form-check-label px-2">
-                                    <input type="checkbox" class="form-check-input" value="{{ values.value_name }}">{{ values.value_name }}: {{ values.count }} 
-                                </label>
-                            </li>
-                        {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            <a class="btn btn-success btn-block my-1" role="button" href="{{ url_for(
+<div class="row">
+  <!-- меню фильтров -->
+  <div class="col-3">
+    <h5>Фильтры</h5>
+    <h5 name="subcategoryid" value="subcategory_id">
+      Подкатегория: {{ subcategory }}
+    </h5>
+    <div class="dropdown">
+      {% for aspect in histogram_container_data %}
+      <div class="my-1">
+        <button
+          type="button"
+          class="btn btn-info dropdown-toggle btn-block"
+          data-toggle="dropdown"
+          value="{{ aspect.aspect_name }}"
+        >
+          {{ aspect.aspect_name }}
+        </button>
+        <div class="dropdown-menu">
+          {% for values in aspect.aspect_data %}
+          <li class="form-check">
+            <label class="form-check-label px-2">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                value="{{ values.value_name }}"
+              />{{ values.value_name }}: {{ values.count }}
+            </label>
+          </li>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <a
+      class="btn btn-success btn-block my-1"
+      role="button"
+      href="{{ url_for(
                 'search.search',
                 q=request.args.get('q', ''),
                 categoryid=subcategoryid,
                 filters=request.args.get('filters', ''),
-                ) }}">Применить фильтры
-            </a>
+                ) }}"
+      >Применить фильтры
+    </a>
+  </div>
+  <!-- конец меню фильтров -->
+  <div class="col-9">
+    <h2>{{ title }}</h2>
+    {% for item in results %}
+    <div class="card mb-3">
+      <div class="row no-gutters">
+        <div class="col-sm-2">
+          <div class="text-center">
+            <img
+              src="{{ item.gallery_url }}"
+              class="img-thumbnail"
+              alt="{{ item.title }}"
+            />
+          </div>
         </div>
-<!-- конец меню фильтров -->
-        <div class="col-9">
-        <h2>{{ title }}</h2>
-            {% for item in results %}
-            <div class="card mb-3" >
-                <div class="row no-gutters">
-                    <div class="col-sm-2">
-                        <div class="text-center">
-                            <img src="{{ item.gallery_url }}" class="img-thumbnail" alt="{{ item.title }}">
-                        </div>
-                    </div>
-                    <div class="col-sm-10">
-                        <div class="card-body">
-                            <h5 class="card-title"><a href="{{ item.view_item_url }}" target="_blank">{{ item.title }}</a></h5>
-                            <p class="card-text">
-                                Текущая стоимость: {{ item.item_current_price }} USD
-                            </p>
-                            <div class="card-text">
-                                Состояние: {{ item.condition_display_name }}
-                            </div>
-                            <div class="card-text mt-1" >
-                                Количество ставок: {{ item.bid_count }}
-                            </div>
-                            <p class="card-text">
-                                <small class="text-muted">До конца аукциона: {{ item.time_left }}</small>
-                            </p>
-                            {% for wish in watch_list if wish.item_id == item.item_id %}
-                                <a href="{{ url_for('search.remove_from', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-danger" role="button">удалить из "Избранного"</a>
-                            {% else %}
-                                <a href="{{ url_for('search.add_to', itemid=item.item_id) }}" target="_blank" class="btn btn-outline-warning" role="button">добавить в "Избранное"</a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
+        <div class="col-sm-10">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{{ item.view_item_url }}" target="_blank"
+                >{{ item.title }}</a
+              >
+            </h5>
+            <p class="card-text">
+              Текущая стоимость: {{ item.item_current_price }} USD
+            </p>
+            <div class="card-text">
+              Состояние: {{ item.condition_display_name }}
             </div>
+            <div class="card-text mt-1">
+              Количество ставок: {{ item.bid_count }}
+            </div>
+            <p class="card-text">
+              <small class="text-muted"
+                >До конца аукциона: {{ item.time_left }}</small
+              >
+            </p>
+            {% for wish in watch_list if wish.item_id == item.item_id %}
+            <a
+              href="{{ url_for('search.remove_from', itemid=item.item_id) }}"
+              target="_blank"
+              class="btn btn-outline-danger"
+              role="button"
+              >удалить из "Избранного"</a
+            >
+            {% else %}
+            <a
+              href="{{ url_for('search.add_to', itemid=item.item_id) }}"
+              target="_blank"
+              class="btn btn-outline-warning"
+              role="button"
+              >добавить в "Избранное"</a
+            >
             {% endfor %}
+          </div>
         </div>
-        {% include 'ebay_search/pagination.html' %}
-    </div> 
-{% endif %}
-{% endblock %}
-{% block script %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% include 'ebay_search/pagination.html' %}
+</div>
+{% endif %} {% endblock %} {% block script %}
 <script>
-    $(document).ready(function () {
-        const generateUrlParams = function (url) {
-            let params = '';
-            // url = decodeURIComponent(url)
-            const buttons = $('button.dropdown-toggle');
-            buttons.each(function (index) {
-                const buttonText = $(this).text();
-                const dropdown = $(this).next();
-                const checkboxes = dropdown.find('input[type=checkbox]:checked');
-                const checkboxesLength = checkboxes.length;
-                if (checkboxesLength) {
-                    params += buttonText.trim() + ':';
-                }
-                checkboxes.each(function (index) {
-                    params += $(this).val();
-                    const checkboxNumber = index + 1;
-                    if (!(checkboxNumber === checkboxesLength)) {
-                        params += ',';
-                    }
-                });
-                const buttonNumber = index + 1;
-                if (checkboxesLength) {
-                    params += ';';
-                }
-            });
-            params = encodeURIComponent(params)
-            return url + params;
-        };
-        const filterButton = $('.btn-success');
-        const url = filterButton.attr('href');
-
-        filterButton.on('click', function (e) {
-            e.preventDefault();
-            window.location = generateUrlParams(url);
+  $(document).ready(function () {
+    const generateUrlParams = function (url) {
+      let params = "";
+      // url = decodeURIComponent(url)
+      const buttons = $("button.dropdown-toggle");
+      buttons.each(function (index) {
+        const buttonText = $(this).text();
+        const dropdown = $(this).next();
+        const checkboxes = dropdown.find("input[type=checkbox]:checked");
+        const checkboxesLength = checkboxes.length;
+        if (checkboxesLength) {
+          params += buttonText.trim() + ":";
+        }
+        checkboxes.each(function (index) {
+          params += $(this).val();
+          const checkboxNumber = index + 1;
+          if (!(checkboxNumber === checkboxesLength)) {
+            params += ",";
+          }
         });
+        const buttonNumber = index + 1;
+        if (checkboxesLength) {
+          params += ";";
+        }
+      });
+      params = encodeURIComponent(params);
+      return url + params;
+    };
+    const filterButton = $(".btn-success");
+    const url = filterButton.attr("href");
+
+    filterButton.on("click", function (e) {
+      e.preventDefault();
+      window.location = generateUrlParams(url);
     });
+  });
 </script>
 {% endblock %}
