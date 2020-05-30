@@ -1,23 +1,23 @@
 {% extends "base.html" %} {% block content %}
 <div class="row">
   <div class="col-2"></div>
-  <div class="col-8">
+  <div class="col-8 my-3">
     <h2>{{ page_title }}</h2>
     <h3>
       Cервер работает только для зарегистрированных пользователей. Пожалуйта,
       авторизуйтесь или пройдите регистрацию
     </h3>
-    <div>
+    <div class="my-3">
       <a
         href="{{ url_for('user.login') }}"
-        class="btn btn-primary btn-lg active"
+        class="btn btn-primary btn-lg active mx-3"
         role="button"
         aria-pressed="true"
         >Авторизация</a
       >
       <a
         href="{{ url_for('user.register') }}"
-        class="btn btn-primary btn-lg active"
+        class="btn btn-primary btn-lg active mx-3"
         role="button"
         aria-pressed="true"
         >Регистрация</a
